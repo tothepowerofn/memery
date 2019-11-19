@@ -8,3 +8,9 @@
 #include <iostream>
 
 void* ascii_hex_to_ptr(char* hexstring);
+
+unsigned char read_byte(void *addr);
+unsigned int read_int(void *addr);
+
+void* heap_start();
+void* heap_end();
