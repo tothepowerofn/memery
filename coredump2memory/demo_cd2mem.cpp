@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
     struct stat sb;
 
     if(argc != 4){
-        cout << "Usage: demo_cd2mem [filename of heap core dump] [starting heap addr as 0x..] [ending heap addr as 0x..]";
+        cout << "Usage: demo_cd2mem [filename of heap core dump] [starting heap addr as 0x..] [ending heap addr as 0x..]" << endl;
+        exit(0);
     }
 
     fd = open(argv[1], O_RDONLY);
