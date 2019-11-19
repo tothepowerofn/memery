@@ -18,17 +18,18 @@ int main(int argc, char *argv[])
     cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
 
     fstat(fd, &sb);
-    printf("Size of dump: %lu\n", (uint64_t)sb.st_size);
+    cout << "Size of dump: " << (uint64_t)sb.st_size;
 
     memblock = (char*)mmap(NULL, sb.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
     if (memblock == MAP_FAILED){
-        printf("failed to mmap :(\n");
+        cout << "Failed to mmap :(" << endl;
     }
 
+    cout << "First 10 hex characters:" << endl;
     for(uint64_t i = 0; i < 10; i++)
     {
         printf("[%lu]=%X ", i, memblock[i]);
     }
-    printf("\n");
+    cout << endl;
     return 0;
 }
