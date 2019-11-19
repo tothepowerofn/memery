@@ -28,8 +28,8 @@ def read_write_heap(pid):
 	addr = heap_info[0].split('-')
 	heap_start = addr[0]
 	heap_end = addr[1]
-	print(heap_start)
-	print(heap_end)
+	print("0x" + heap_start)
+	print("0x" + heap_end)
 	return heap_start, heap_end
 
 

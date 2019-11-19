@@ -9,5 +9,6 @@ addr_start=${addr_list[0]}
 addr_end=${addr_list[1]}
 echo $addr_start
 echo $addr_end
-
-gdb -p $process_id -ex 'dump binary memory ~/dump.bin $addr_start $addr_end'
+rm gdb_commands
+echo "dump binary memory ~/dump.bin $addr_start $addr_end" >> gdb_commands
+gdb -p $process_id --command=gdb_commands
