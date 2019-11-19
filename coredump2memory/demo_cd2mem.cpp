@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     fd = open(argv[1], O_RDONLY);
     starting_addr = ascii_hex_to_ptr(argv[2]);
     ending_addr = ascii_hex_to_ptr(argv[3]);
+
     cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
 
     fstat(fd, &sb);
