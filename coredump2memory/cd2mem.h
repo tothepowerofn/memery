@@ -14,3 +14,6 @@ unsigned int read_int(void *addr);
 
 void* heap_start();
 void* heap_end();
+
+void set_heap_start(void* addr);
+void set_heap_end(void* addr);

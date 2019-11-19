@@ -1,9 +1,13 @@
 #include "cd2mem.h"
 
 using namespace std;
+
+extern void* starting_addr;
+extern void* ending_addr;
+extern char* memblock;
+
 int main(int argc, char *argv[])
 {
-    const char *memblock;
     int fd;
     struct stat sb;
 
@@ -13,8 +17,8 @@ int main(int argc, char *argv[])
     }
 
     fd = open(argv[1], O_RDONLY);
-    void* starting_addr = ascii_hex_to_ptr(argv[2]);
-    void* ending_addr = ascii_hex_to_ptr(argv[3]);
+    starting_addr = ascii_hex_to_ptr(argv[2]);
+    ending_addr = ascii_hex_to_ptr(argv[3]);
     cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
 
     fstat(fd, &sb);
