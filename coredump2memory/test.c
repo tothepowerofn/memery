@@ -3,8 +3,8 @@
 int main(){
     int a = 1;
     int b = 2;
-    int* heapvar = (int*)malloc(sizeof(int));
+    int* heapvar = (int*)malloc(100*sizeof(int));
     printf("%p\n", heapvar);
     heapvar[3] = 5;
-    sleep(100);
+    sleep(1000);
 }
