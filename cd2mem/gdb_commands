@@ -1,1 +1,1 @@
-dump binary memory ~/dump.bin 0x01a31000 0x01a52000
+dump binary memory ~/memery/dump.bin 0x55571810e000 0x55571812f000

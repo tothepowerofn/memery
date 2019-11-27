@@ -1,4 +1,3 @@
-
 process_to_get=$1
 process_id=`pidof $process_to_get`
 echo $process_id
@@ -10,5 +9,5 @@ addr_end=${addr_list[1]}
 echo $addr_start
 echo $addr_end
 rm gdb_commands
-echo "dump binary memory ~/dump.bin $addr_start $addr_end" >> gdb_commands
-gdb -p $process_id --command=gdb_commands
+echo "dump binary memory ~/memery/dump.bin $addr_start $addr_end" >> gdb_commands
+gdb -p $process_id --command=gdb_commands << 'EOF'
