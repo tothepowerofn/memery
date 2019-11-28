@@ -53,9 +53,8 @@ void grab_addr(uint64_t rel_start){
 		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
 	}
 
-	//fprintf(fptr,"%s\n", res);
 	unsigned long res1 = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
-	//fprintf(fptr, "new addr: %lu\n", res1);
+	fprintf(fptr, "new addr: %lu\n", res1);
 	//fprintf(fptr, "%lx\n", strtoul(res, NULL, 16));
 	
 	//printf("heap start: %lu\n", strtoul((const char*)starting_addr, &end, 16));
