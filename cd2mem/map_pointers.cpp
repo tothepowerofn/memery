@@ -32,22 +32,15 @@ int main(int argc, char *argv[])
 
 	long num_p = ((sb.st_size / 8) + 1);
 	struct pointer* p_arr = (struct pointer*) malloc(num_p * sizeof(*p_arr));
-	/*TODO:
-		- make array of structs for entire file
-			- each struct will have pointer value
-			- and also mark type of pointer (V = value, P = pointer)
-		- make grabpointer function
-			- converts 8 byte block into pointer
-			- adjusts pointer for relative offsets
-	*/
 	uint64_t fl_sz = sb.st_size;
     for(uint64_t i = 0; i < fl_sz-8; i+=8)
     {
 		unsigned long addr = grab_addr(i);
 		p_arr[i].ptr = (void*)addr;
 		p_arr[i].type = 1;
-		// assign it to the struct!
     }
+	// TODO: Iterate through p_arr and chase pointer one depth down.
+	// If pointer seg faults, then change type to 0.  
     cout << endl;
     return 0;
 }
