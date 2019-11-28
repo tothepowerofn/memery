@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     for(uint64_t i = 0; i < fl_sz-8; i+=8)
     {
 		unsigned long addr = grab_addr(i);
+		p_arr[i].ptr = (void*)addr;
+		p_arr[i].type = 1;
 		// assign it to the struct!
     }
     cout << endl;
