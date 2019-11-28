@@ -1,5 +1,6 @@
 #include "cd2mem.h"
 #include <memory.h>
+#include <stdlib.h>
 #define PTR_SIZE 8
 
 void* starting_addr;
@@ -37,24 +38,27 @@ void set_heap_end(void* addr){
 
 // will grab the next 8 bytes of mem block, to be stored in pointer map
 void grab_addr(uint64_t rel_start){
-	FILE *fptr1 = fopen("temp.txt", "a");
-	char res[17];
-	memset(res, 0, 17);
+	FILE *fptr = fopen("temp.txt", "a");
+	char res[19];
+	memset(res, 0, 19);
+	sprintf(res + strlen(res), "%s", "0x");
 	
 	for(int i = 7; i>=0; i--){ 	
+		char temp[3];
+		memset(temp, 0, 3);
+		sprintf(temp + strlen(temp), "%hhx", *(memblock+rel_start+i));
+		if(strlen(temp) == 1){
+			sprintf(res + strlen(res), "%s", "0");
+			//fprintf(fptr, "extra 0\n");
+		}
 		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
 	}
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+6));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+5));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+4));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+3));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+2));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+1));
-	//sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+0));
 
-	//printf("%s\n", res);
-	fprintf(fptr1, "%s\n", res);
-	//fprintf(fptr1,"addr: %s%s%s%s%s%s%s%s\n", byte0, byte1, byte2, byte3, byte4, byte5, byte6, byte7); 
-	//fprintf(fptr1,"addr: %s\n", byte0); 
-	fclose(fptr1);
+	fprintf(fptr,"%s\n", res);
+	unsigned long res1 = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
+	//fprintf(fptr, "new addr: %lu\n", res1);
+	//fprintf(fptr, "%lx\n", strtoul(res, NULL, 16));
+	
+	//printf("heap start: %lu\n", strtoul((const char*)starting_addr, &end, 16));
+	fclose(fptr);
 }
