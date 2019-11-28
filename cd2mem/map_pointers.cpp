@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
 	uint64_t fl_sz = sb.st_size;
     for(uint64_t i = 0; i < fl_sz-8; i+=8)
     {
-		grab_addr(i);
-        //printf("[%lu]=%X ", i, memblock[i]);
+		unsigned long addr = grab_addr(i);
+		// assign it to the struct!
     }
     cout << endl;
     return 0;

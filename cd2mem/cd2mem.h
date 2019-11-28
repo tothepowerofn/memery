@@ -27,4 +27,4 @@ void set_heap_start(void* addr);
 void set_heap_end(void* addr);
 
 
-void grab_addr(uint64_t rel_start);
+unsigned long grab_addr(uint64_t rel_start);
