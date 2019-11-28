@@ -36,11 +36,13 @@ int main(int argc, char *argv[])
     for(uint64_t i = 0; i < fl_sz-8; i+=8)
     {
 		unsigned long addr = grab_addr(i);
-		p_arr[i].ptr = (void*)addr;
-		p_arr[i].type = 1;
+		// TODO: seg fault happens here. idk why. 
+		//p_arr[i].ptr = (void*)addr;
+		//p_arr[i].type = 1;
     }
 	// TODO: Iterate through p_arr and chase pointer one depth down.
-	// If pointer seg faults, then change type to 0.  
+	// If pointer seg faults, then change type to 0. 
+	 
     cout << endl;
     return 0;
 }
