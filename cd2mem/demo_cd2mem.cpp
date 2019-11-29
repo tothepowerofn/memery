@@ -2,9 +2,9 @@
 
 using namespace std;
 
-extern void* starting_addr;
-extern void* ending_addr;
-extern char* memblock;
+uintptr_t starting_addr;
+uintptr_t ending_addr;
+char* memblock;
 
 int main(int argc, char *argv[])
 {

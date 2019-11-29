@@ -3,41 +3,41 @@
 #include <stdlib.h>
 #define PTR_SIZE 8
 
-void* starting_addr;
-void* ending_addr;
-char* memblock;
+extern uintptr_t starting_addr;
+extern uintptr_t ending_addr;
+extern char* memblock;
 
 
-void* ascii_hex_to_ptr(char* hexstring){
-    return (void*)strtol(hexstring, NULL, 0);
+uintptr_t ascii_hex_to_ptr(char* hexstring){
+    return (uintptr_t)strtol(hexstring, NULL, 0);
 }
 
-unsigned char read_byte(void *addr){
+unsigned char read_byte(uintptr_t addr){
     return *(memblock - (char*)starting_addr + (char*)addr);
 }
 
-unsigned int read_int(void *addr){
+unsigned int read_int(uintptr_t addr){
     return *((unsigned int*)memblock - (unsigned int*)starting_addr + (unsigned int*)addr);
 }
 
-void* heap_start(){
+uintptr_t heap_start(){
     return starting_addr;
 }
 
-void* heap_end(){
+uintptr_t heap_end(){
     return ending_addr;
 }
 
-void set_heap_start(void* addr){
+void set_heap_start(uintptr_t addr){
     starting_addr = addr;
 }
 
-void set_heap_end(void* addr){
+void set_heap_end(uintptr_t addr){
     ending_addr = addr;
 }
 
 // will grab the next 8 bytes of mem block, to be stored in pointer map
-unsigned long grab_addr(uint64_t rel_start){
+uintptr_t grab_addr(uintptr_t rel_start){
 	FILE *fptr = fopen("temp.txt", "a");
 	char res[19];
 	memset(res, 0, 19);
@@ -53,7 +53,7 @@ unsigned long grab_addr(uint64_t rel_start){
 		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
 	}
 
-	unsigned long new_addr = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
+	uintptr_t new_addr = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
 	fprintf(fptr, "new addr: %lu\n", new_addr);
 	fclose(fptr);
 	return new_addr;

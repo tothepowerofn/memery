@@ -1,10 +1,11 @@
 #include "cd2mem.h"
+#include "assert.h"
 
 using namespace std;
 
-extern void* starting_addr;
-extern void* ending_addr;
-extern char* memblock;
+uintptr_t starting_addr;
+uintptr_t ending_addr;
+char* memblock;
 
 int main(int argc, char *argv[])
 {
@@ -15,10 +16,10 @@ int main(int argc, char *argv[])
         cout << "Usage: map_pointers [filename of heap core dump] [starting heap addr as 0x..] [ending heap addr as 0x..]" << endl;
         exit(0);
     }
-
+    
     fd = open(argv[1], O_RDONLY);
     starting_addr = ascii_hex_to_ptr(argv[2]);
-    ending_addr = ascii_hex_to_ptr(argv[3]);
+    ending_addr = ascii_hex_to_ptr(argv[3]) + sizeof(uintptr_t);
 
     cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
 
@@ -30,16 +31,25 @@ int main(int argc, char *argv[])
         cout << "Failed to mmap :(" << endl;
     }
 
+    /* number of and array of qwords in heap memory */
 	long num_p = ((sb.st_size / 8) + 1);
-	struct pointer* p_arr = (struct pointer*) malloc(num_p * sizeof(*p_arr));
-	uint64_t fl_sz = sb.st_size;
-    for(uint64_t i = 0; i < fl_sz-8; i+=8)
+    assert(num_p == (ending_addr - starting_addr) / 8);
+	struct pointer* p_arr = (struct pointer*) malloc(num_p * sizeof(struct pointer));
+
+    /* copy values from dump */
+    for(uint64_t i = 0; i < num_p; i++)
     {
-		unsigned long addr = grab_addr(i);
-		// TODO: seg fault happens here. idk why. 
-		//p_arr[i].ptr = (void*)addr;
-		//p_arr[i].type = 1;
+    	unsigned long addr = grab_addr(i*8);
+    	p_arr[i].ptr = (uintptr_t) addr;
+		if (p_arr[i].ptr > ending_addr - starting_addr) {
+            p_arr[i].type = 0;
+        } else {
+            p_arr[i].type = 1;
+        }
+        cout << i << " " << p_arr[i].type << " " << p_arr[i].ptr << endl;
     }
+
+
 	// TODO: Iterate through p_arr and chase pointer one depth down.
 	// If pointer seg faults, then change type to 0. 
 	 

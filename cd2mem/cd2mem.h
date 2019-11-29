@@ -11,20 +11,20 @@
 // type 0 = nonpointer 
 // type 1 = pointer (of some sort)
 struct pointer{
-	void* ptr;
+	uintptr_t ptr;
 	int type;
 };
 
-void* ascii_hex_to_ptr(char* hexstring);
+uintptr_t ascii_hex_to_ptr(char* hexstring);
 
-unsigned char read_byte(void *addr);
-unsigned int read_int(void *addr);
+unsigned char read_byte(uintptr_t addr);
+unsigned int read_int(uintptr_t addr);
 
-void* heap_start();
-void* heap_end();
+uintptr_t heap_start();
+uintptr_t heap_end();
 
-void set_heap_start(void* addr);
-void set_heap_end(void* addr);
+void set_heap_start(uintptr_t addr);
+void set_heap_end(uintptr_t addr);
 
 
 unsigned long grab_addr(uint64_t rel_start);
