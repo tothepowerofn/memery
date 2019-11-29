@@ -1,3 +1,8 @@
+#ifndef __CD2MEM_H
+#define __CD2MEM_H
+
+#include "mem_struct.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,9 +15,10 @@
 // struct stores pointer and type
 // type 0 = nonpointer 
 // type 1 = pointer (of some sort)
-struct pointer{
-	uintptr_t ptr;
-	int type;
+struct mem_ptr {
+	uintptr_t value;
+	unsigned int type;
+    struct mem_struct *ds;
 };
 
 uintptr_t ascii_hex_to_ptr(char* hexstring);
@@ -28,3 +34,5 @@ void set_heap_end(uintptr_t addr);
 
 
 unsigned long grab_addr(uint64_t rel_start);
+
+#endif

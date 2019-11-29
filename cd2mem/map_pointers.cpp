@@ -1,6 +1,9 @@
 #include "cd2mem.h"
 #include "assert.h"
 
+#define MAX_OFFSET 5
+#define MIN_DEPTH 3
+
 using namespace std;
 
 uintptr_t starting_addr;
@@ -34,25 +37,47 @@ int main(int argc, char *argv[])
     /* number of and array of qwords in heap memory */
 	long num_p = ((sb.st_size / 8) + 1);
     assert(num_p == (ending_addr - starting_addr) / 8);
-	struct pointer* p_arr = (struct pointer*) malloc(num_p * sizeof(struct pointer));
+	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
 
     /* copy values from dump */
     for(uint64_t i = 0; i < num_p; i++)
     {
     	unsigned long addr = grab_addr(i*8);
-    	p_arr[i].ptr = (uintptr_t) addr;
-		if (p_arr[i].ptr > ending_addr - starting_addr) {
-            p_arr[i].type = 0;
-        } else {
-            p_arr[i].type = 1;
-        }
-        cout << i << " " << p_arr[i].type << " " << p_arr[i].ptr << endl;
+    	p_arr[i].value = (uintptr_t) addr;
+		if (p_arr[i].value > ending_addr - starting_addr) p_arr[i].type = 0;
+        else p_arr[i].type = 1;
     }
 
+    unsigned int id = 0;
 
-	// TODO: Iterate through p_arr and chase pointer one depth down.
-	// If pointer seg faults, then change type to 0. 
-	 
+    for(uint64_t i = 0; i < num_p; i++) {
+        if (p_arr[i].ds) continue;
+        if (p_arr[i].type == 0) continue;
+        for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) {
+            uintptr_t addr = i;
+            unsigned int depth = 0;
+            while (p_arr[addr].type == 1) {
+                addr = p_arr[addr].value / 8 + offset;
+                depth++;
+            }
+
+            if (depth >= MIN_DEPTH) {
+                struct mem_struct *ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
+                ds->id = id;
+                ds->ptr_offset = offset;
+                cout << "Found a datastructure" << endl;
+                addr = i;
+                while (p_arr[addr].type == 1) {
+                    cout << "Data (" << p_arr[addr-offset].value << ") at offset " << addr << endl;
+                    p_arr[addr].ds = ds;
+                    addr = p_arr[addr].value / 8 + offset;
+                }
+
+                id++;
+            }
+        }
+    }
+
     cout << endl;
     return 0;
 }

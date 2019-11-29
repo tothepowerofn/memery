@@ -27,7 +27,7 @@ struct doubly_linked_list *doubly_linked_list_append_before(unsigned int value, 
 int main() {
 	for (int i = 0; i < 1; i++) {
 		struct linked_list *list = NULL;
-		for (int j = 0; j < 5; j++) {
+		for (int j = 0; j < 100; j++) {
 			list = linked_list_append_before(66, list);
 		}
 	}
