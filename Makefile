@@ -1,18 +1,37 @@
 COMPILER=g++
-CFLAGS=-g
+CFLAGS=-g -I cd2mem -I tests
 
-.PHONY: all clean cd2mem tests
+.PHONY: all clean cd2mem map_pointers tests
 
 all: cd2mem map_pointers tests
 
 clean:
-	rm -f bin/cd2mem
+	rm -f cd2mem/demo_cd2mem.o
+	rm -f cd2mem/cd2mem.o
+	rm -f cd2mem/map_pointers.o
+	rm -f tests/data_structures.o
+	rm -f bin/demo_cd2mem
+	rm -f bin/map_pointers
+	rm -f bin/tests
 
-cd2mem: cd2mem/cd2mem.cpp cd2mem/cd2mem.h cd2mem/demo_cd2mem.cpp
-	$(COMPILER) $(CFLAGS) -o bin/cd2mem cd2mem/demo_cd2mem.cpp cd2mem/cd2mem.cpp
+demo_cd2mem.o: cd2mem/demo_cd2mem.cpp cd2mem/cd2mem.h
+	$(COMPILER) $(CFLAGS) -c cd2mem/demo_cd2mem.cpp -o cd2mem/demo_cd2mem.o
 
-map_pointers: cd2mem/cd2mem.cpp cd2mem/cd2mem.h cd2mem/map_pointers.cpp
-	$(COMPILER) $(CFLAGS) -o bin/map_pointers cd2mem/map_pointers.cpp cd2mem/cd2mem.cpp
+cd2mem.o: cd2mem/cd2mem.cpp cd2mem/cd2mem.h
+	$(COMPILER) $(CFLAGS) -c cd2mem/cd2mem.cpp -o cd2mem/cd2mem.o
 
-tests: tests/data_structures.c tests/data_structures.h
-	$(COMPILER) $(CFLAGS) -o bin/linked_lists tests/data_structures.c
+map_pointers.o: cd2mem/map_pointers.cpp cd2mem/cd2mem.h
+	$(COMPILER) $(CFLAGS) -c cd2mem/map_pointers.cpp -o cd2mem/map_pointers.o
+
+data_structures.o: tests/data_structures.c tests/data_structures.h
+	$(COMPILER) $(CFLAGS) -c tests/data_structures.c -o tests/data_structures.o
+
+demo_cd2mem: demo_cd2mem.o cd2mem.o
+	$(COMPILER) $(CFLAGS) cd2mem/demo_cd2mem.o cd2mem/cd2mem.o -o bin/demo_cd2mem
+
+map_pointers: map_pointers.o cd2mem.o
+	$(COMPILER) $(CFLAGS) cd2mem/map_pointers.o cd2mem/cd2mem.o -o bin/map_pointers
+
+tests: data_structures.o
+	$(COMPILER) $(CFLAGS) tests/data_structures.o -o bin/tests
+

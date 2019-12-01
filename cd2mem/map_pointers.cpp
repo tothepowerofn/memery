@@ -10,13 +10,21 @@ uintptr_t starting_addr;
 uintptr_t ending_addr;
 char* memblock;
 
-int main(int argc, char *argv[])
-{
+void usage() {
+    cout << "This program does first scan analysis of pointers in the heap of the core" << endl
+         << "Usage: map_pointers core start_addr end_addr" << endl 
+         << " core       : filename of heap core dump" << endl
+         << " start_addr : starting heap addr as hexadecimal address" << endl
+         << " end_addr   : ending heap address as hexadecimal address" << endl; 
+    return;
+}
+
+int main(int argc, char *argv[]) {
     int fd;
     struct stat sb;
 
-    if(argc != 4){
-        cout << "Usage: map_pointers [filename of heap core dump] [starting heap addr as 0x..] [ending heap addr as 0x..]" << endl;
+    if(argc != 4) {
+		usage();
         exit(0);
     }
     
