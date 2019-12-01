@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     /* copy values from dump */
     for(uint64_t i = 0; i < num_p; i++)
     {
-    	unsigned long addr = grab_addr(i*8);
+    	unsigned long addr = grab_addr(i*8); //TODO: how do we know that this doesn't overflow?
     	p_arr[i].ptr = (uintptr_t) addr;
 		if (p_arr[i].ptr > ending_addr - starting_addr) {
             p_arr[i].type = 0;
