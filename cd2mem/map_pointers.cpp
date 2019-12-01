@@ -27,16 +27,18 @@ int main(int argc, char *argv[]) {
 		usage();
         exit(0);
     }
-    
+   
+	/* open file and set starting/ending addresses */ 
     fd = open(argv[1], O_RDONLY);
     starting_addr = ascii_hex_to_ptr(argv[2]);
     ending_addr = ascii_hex_to_ptr(argv[3]) + sizeof(uintptr_t);
-
     cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
 
+	/* size of heap core dump */	
     fstat(fd, &sb);
     cout << "Size of dump: " << (uint64_t)sb.st_size << "\n";
 
+	/* map heap core dump into memory */
     memblock = (char*)mmap(NULL, sb.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
     if (memblock == MAP_FAILED){
         cout << "Failed to mmap :(" << endl;
