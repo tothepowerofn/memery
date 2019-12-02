@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 	/* map heap core dump into memory */
     memblock = (char*)mmap(NULL, sb.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
-    if (memblock == MAP_FAILED){
+    if (memblock == MAP_FAILED) {
         cout << "Failed to mmap :(" << endl;
     }
 
@@ -50,8 +50,7 @@ int main(int argc, char *argv[]) {
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
 
     /* copy values from dump */
-    for(uint64_t i = 0; i < num_p; i++)
-    {
+    for(uint64_t i = 0; i < num_p; i++) {
     	unsigned long addr = grab_addr(i*8);
     	p_arr[i].addr = (uintptr_t) addr;
 		if (p_arr[i].addr > ending_addr - starting_addr) p_arr[i].type = 0;
@@ -59,34 +58,32 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned int id = 0;
-
+    /* Go through all candidate pointers in p_arr */
     for(uint64_t i = 0; i < num_p; i++) {
-        if (p_arr[i].ds) continue;
-        if (p_arr[i].type == 0) continue;
-        for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) {
+        if (p_arr[i].ds) continue; // If it's already assigned to datastructure
+        if (p_arr[i].type == 0) continue; //If it's not a pointer
+        for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
             uintptr_t index = i;
             unsigned int depth = 0;
-            while (p_arr[index].type == 1) {
-                cout << offset << endl;
-                index = p_arr[index].addr + offset;
+            while (p_arr[index].type == 1) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
+                cout << offset << endl; 
+                index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
                 depth++;
             }
 
             if (depth >= MIN_DEPTH) {
-                struct mem_struct *ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
-                ds->id = id;
+                struct mem_struct *ds = (struct mem_struct*) malloc(sizeof(struct mem_struct)); //Create a new datastructure
+                ds->id = id; 
                 ds->ptr_offset = offset;
                 cout << "Found a datastructure" << endl;
-                index = i;
-                while (p_arr[index].type == 1) {
-					//wtf r u printing for data, noah? -nathan
-                    //cout << "Data (" << p_arr[index-offset].addr << ") at offset " << index << endl;
+                index = i; // Start at the current pointer we are considering
+                while (p_arr[index].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
                     cout << "Next pointer: (" << p_arr[index].addr << ") at offset " << index << endl;
                     p_arr[index].ds = ds;
-                    index = p_arr[index].addr + offset;
+                    index = p_arr[index].addr + offset; 
                 }
 
-                id++;
+                id++; 
             }
         }
     }
