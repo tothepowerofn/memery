@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
             uintptr_t index = i;
             unsigned int depth = 0;
             while (p_arr[index].type == 1) {
-                index = p_arr[index].addr / 8 + offset;
+                index = p_arr[index].addr + offset;
                 depth++;
             }
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
                     //cout << "Data (" << p_arr[index-offset].addr << ") at offset " << index << endl;
                     cout << "Next pointer: (" << p_arr[index-offset].addr << ") at offset " << index << endl;
                     p_arr[index].ds = ds;
-                    index = p_arr[index].addr / 8 + offset;
+                    index = p_arr[index].addr + offset;
                 }
 
                 id++;

@@ -56,5 +56,5 @@ uintptr_t grab_addr(uintptr_t rel_start){
 	uintptr_t new_addr = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
 	fprintf(fptr, "new addr: %lu\n", new_addr);
 	fclose(fptr);
-	return new_addr;
+	return new_addr / 8;
 }
