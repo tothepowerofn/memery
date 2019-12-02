@@ -67,6 +67,7 @@ int main(int argc, char *argv[]) {
             uintptr_t index = i;
             unsigned int depth = 0;
             while (p_arr[index].type == 1) {
+                cout << offset << endl;
                 index = p_arr[index].addr + offset;
                 depth++;
             }
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
                 while (p_arr[index].type == 1) {
 					//wtf r u printing for data, noah? -nathan
                     //cout << "Data (" << p_arr[index-offset].addr << ") at offset " << index << endl;
-                    cout << "Next pointer: (" << p_arr[index-offset].addr << ") at offset " << index << endl;
+                    cout << "Next pointer: (" << p_arr[index].addr << ") at offset " << index << endl;
                     p_arr[index].ds = ds;
                     index = p_arr[index].addr + offset;
                 }
