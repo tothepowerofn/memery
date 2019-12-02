@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
     for(uint64_t i = 0; i < num_p; i++)
     {
     	unsigned long addr = grab_addr(i*8);
-    	p_arr[i].value = (uintptr_t) addr;
-		if (p_arr[i].value > ending_addr - starting_addr) p_arr[i].type = 0;
+    	p_arr[i].addr = (uintptr_t) addr;
+		if (p_arr[i].addr > ending_addr - starting_addr) p_arr[i].type = 0;
         else p_arr[i].type = 1;
     }
 
@@ -64,10 +64,10 @@ int main(int argc, char *argv[]) {
         if (p_arr[i].ds) continue;
         if (p_arr[i].type == 0) continue;
         for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) {
-            uintptr_t addr = i;
+            uintptr_t index = i;
             unsigned int depth = 0;
-            while (p_arr[addr].type == 1) {
-                addr = p_arr[addr].value / 8 + offset;
+            while (p_arr[index].type == 1) {
+                index = p_arr[index].addr / 8 + offset;
                 depth++;
             }
 
@@ -76,11 +76,13 @@ int main(int argc, char *argv[]) {
                 ds->id = id;
                 ds->ptr_offset = offset;
                 cout << "Found a datastructure" << endl;
-                addr = i;
-                while (p_arr[addr].type == 1) {
-                    cout << "Data (" << p_arr[addr-offset].value << ") at offset " << addr << endl;
-                    p_arr[addr].ds = ds;
-                    addr = p_arr[addr].value / 8 + offset;
+                index = i;
+                while (p_arr[index].type == 1) {
+					//wtf r u printing for data, noah? -nathan
+                    //cout << "Data (" << p_arr[index-offset].addr << ") at offset " << index << endl;
+                    cout << "Next pointer: (" << p_arr[index-offset].addr << ") at offset " << index << endl;
+                    p_arr[index].ds = ds;
+                    index = p_arr[index].addr / 8 + offset;
                 }
 
                 id++;

@@ -16,7 +16,7 @@
 // type 0 = nonpointer 
 // type 1 = pointer (of some sort)
 struct mem_ptr {
-	uintptr_t value;
+	uintptr_t addr;
 	unsigned int type;
     struct mem_struct *ds;
 };
