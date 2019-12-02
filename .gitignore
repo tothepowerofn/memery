@@ -1,3 +1,5 @@
-dump.bin
 *.swp
+*.o
+*.bin
+.vscode
 gdb_commands
