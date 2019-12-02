@@ -36,8 +36,13 @@ void set_heap_end(uintptr_t addr){
     ending_addr = addr;
 }
 
-// will grab the next 8 bytes of mem block, to be stored in pointer map
-uintptr_t grab_addr(uintptr_t rel_start){
+uintptr_t to_addr(uintptr_t addr) {
+	uintptr_t potential_addr = addr - (uintptr_t) starting_addr;
+	return potential_addr / 8;
+}
+	
+// will grab the next 8 bytes of mem block
+uintptr_t get_val(uintptr_t rel_start){
 	FILE *fptr = fopen("temp.txt", "a");
 	char res[19];
 	memset(res, 0, 19);
@@ -52,9 +57,8 @@ uintptr_t grab_addr(uintptr_t rel_start){
 		}
 		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
 	}
-
-	uintptr_t new_addr = strtoul(res, NULL, 16) - (uintptr_t) starting_addr;
-	fprintf(fptr, "new addr: %lu\n", new_addr);
+	uintptr_t lu_res = strtoul(res, NULL, 16);
+	fprintf(fptr, "Value: %lu\n", lu_res);
 	fclose(fptr);
-	return new_addr / 8;
+	return lu_res;
 }

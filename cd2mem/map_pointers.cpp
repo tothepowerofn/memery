@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) {
 
     /* copy values from dump */
     for(uint64_t i = 0; i < num_p; i++) {
-    	unsigned long addr = grab_addr(i*8);
+    	uintptr_t val = get_val(i*8);
+		uintptr_t addr = to_addr(val);
     	p_arr[i].addr = (uintptr_t) addr;
 		if (p_arr[i].addr > ending_addr - starting_addr) p_arr[i].type = 0;
         else p_arr[i].type = 1;
