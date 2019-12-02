@@ -87,7 +87,14 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
+    // TODO: Test with larger ds
+    // TODO: Only print unique ds
+    // TODO: Print out size of ds
+    // TODO: Doubly-linked lists
+    // TODO: Differentiating between ds's in mixed program
+    // TODO: Binary trees
+    // TODO: How to fine-tune depth/offsets? Ask Mickens.
     cout << endl;
     return 0;
 }
+
