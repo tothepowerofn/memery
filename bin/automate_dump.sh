@@ -14,6 +14,6 @@ addr_end=${addr_list[1]}
 echo $addr_start
 echo $addr_end
 rm -f gdb_commands
-echo "dump binary memory ~/memery/dump.bin $addr_start $addr_end" >> gdb_commands
+echo -e "dump binary memory ~/memery/dump.bin $addr_start $addr_end\nquit" >> gdb_commands
 gdb -p $process_id --command=gdb_commands 
 ./map_pointers ../dump.bin $addr_start $addr_end
