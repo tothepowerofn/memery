@@ -69,22 +69,29 @@ uintptr_t get_val(uintptr_t rel_start){
 }
 
 void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
-	while (p_arr[index].type == 1) {
+	while (p_arr[index].type == 1 && p_arr[index].seeloop) {
 		p_arr[index].seeloop = 0;
 		index = p_arr[index].addr + offset;
 	}
 }
 
-int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
+int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds) {
 	int depth = 0;
 	uintptr_t reset_index = index;
+
+    // *ds stores second return value --- pre-existing data structure
+    *pre_ds = NULL;
+
 	// Count how many pointers we can chase (i.e. nodes in the data structure)
 	while (p_arr[index].type == 1) { 
 		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
 		if (p_arr[index].seeloop == 1) {
 			//cout << "FOUND A LOOP" << endl;
 			break;
-		}
+		} else if (p_arr[index].ds) { // we have encountered a pre-existing data structure
+            *pre_ds = p_arr[index].ds;
+            break;
+        }
 		p_arr[index].seeloop = 1;
 		//cout << "CURRENT INDEX: " << index << endl;
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
@@ -95,21 +102,10 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) 
 	return depth;
 }
 
-struct mem_struct* find_prev_assigned(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
-	while (p_arr[index].type == 1) {
-		if(!p_arr[index].ds) {
-			return p_arr[index].ds;
-		}
-        index = p_arr[index].addr + offset;
-    }
-	return NULL;
-}
-
-
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
 	uintptr_t reset_index = index;
 	while (p_arr[index].type == 1) { 
-		if (p_arr[index].seeloop == 1) {
+		if (p_arr[index].seeloop == 1 || p_arr[index].ds) {
 			break;
 		}
 		p_arr[index].seeloop = 1;

@@ -75,13 +75,13 @@ int main(int argc, char *argv[]) {
         for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
             uintptr_t index = i;
 			/* finds depth of chain with given offset */
-			int depth = find_chain_len(p_arr, index, offset);
+            struct mem_struct *ds;
+			int depth = find_chain_len(p_arr, index, offset, &ds);
 			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
 			if(depth < MIN_DEPTH) {
 				//cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
-			struct mem_struct* ds = find_prev_assigned(p_arr, index, offset);
 			// if the linked list belongs to previously found linked list
 			if(ds != NULL) {
 				//cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
