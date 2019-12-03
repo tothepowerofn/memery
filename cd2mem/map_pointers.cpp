@@ -76,16 +76,20 @@ int main(int argc, char *argv[]) {
             uintptr_t index = i;
 			/* finds depth of chain with given offset */
 			int depth = find_chain_len(p_arr, index, offset);
+			cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
 			if(depth < MIN_DEPTH) {
+				cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
 			struct mem_struct* ds = find_prev_assigned(p_arr, index, offset);
 			// if the linked list belongs to previously found linked list
 			if(ds != NULL) {
+				cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
 				assign_chain_ds(p_arr, index, offset, ds);
 			}
 			// belongs to a new data structure
 			else {
+				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
 				assign_chain_ds(p_arr, index, offset, ds);
                 ds->id = id++;
