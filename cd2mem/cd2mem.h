@@ -36,4 +36,8 @@ void set_heap_end(uintptr_t addr);
 uintptr_t get_val(uintptr_t rel_start);
 uintptr_t to_addr(uintptr_t addr);
 
+
+int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset);
+struct mem_struct* find_prev_assigned(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset);
+void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds);
 #endif
