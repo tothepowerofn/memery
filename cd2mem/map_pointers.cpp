@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
             }
 
             if (depth >= MIN_DEPTH) {
-                if (p_arr[i].ds != MAGIC_NUMBER) {
+                if (p_arr[i].ds != (struct mem_struct*) MAGIC_NUMBER) {
                     assert(p_arr[i].ds == ds);
                     break;
                 }
