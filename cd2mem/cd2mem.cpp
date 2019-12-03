@@ -65,35 +65,52 @@ uintptr_t get_val(uintptr_t rel_start){
 	return lu_res;
 }
 
+void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
+	while (p_arr[index].type == 1) {
+		p_arr[index].seeloop = 0;
+		index = p_arr[index].addr + offset;
+	}
+}
+
 int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
 	int depth = 0;
-	while (p_arr[index].type == 1 /*&& (!p_arr[index].ds || p_arr[index].ds == MAGIC_NUMBER)*/) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
-		cout << "current index: " << index << ".ds value" << p_arr[index].ds;
-        cout << depth << endl;
+	// Count how many pointers we can chase (i.e. nodes in the data structure)
+	while (p_arr[index].type == 1) { 
+		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
+		if (p_arr[index].seeloop == 1) {
+			break;
+		}
+		//cout << "current index: " << index << ".ds value" << p_arr[index].ds;
+        //cout << depth << endl;
+		p_arr[index].seeloop = 1;
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
         depth++;
     }
+	reset_seeloop(p_arr, index, offset);
 	return depth;
 }
 
 struct mem_struct* find_prev_assigned(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
-	while (p_arr[index].type == 1) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
-		//cout << "current index: " << index << ".ds value" << p_arr[index].ds;
+	while (p_arr[index].type == 1) {
 		if(!p_arr[index].ds) {
 			return p_arr[index].ds;
 		}
-        index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
+        index = p_arr[index].addr + offset;
     }
 	return NULL;
 }
 
 
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
-	while (p_arr[index].type == 1) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
-		//cout << "current index: " << index << ".ds value" << p_arr[index].ds;
+	while (p_arr[index].type == 1) { 
+		if (p_arr[index].seeloop == 1) {
+			break;
+		}
+		p_arr[index].seeloop = 1;
 		p_arr[index].ds = ds;
-        index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
+        index = p_arr[index].addr + offset;
     }
+	reset_seeloop(p_arr, index, offset);
 }	
 
 

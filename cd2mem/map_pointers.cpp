@@ -54,10 +54,17 @@ int main(int argc, char *argv[]) {
     for(uint64_t i = 0; i < num_p; i++) {
     	uintptr_t val = get_val(i*8);
 		uintptr_t addr = to_addr(val);
+		// initalize values in struct
     	p_arr[i].addr = addr;
-		if (p_arr[i].addr > ending_addr - starting_addr) p_arr[i].type = 0;
-        else p_arr[i].type = 1;
 		p_arr[i].ds = NULL;
+		p_arr[i].seeloop = 0;
+		// check if current index is pointer or not
+		if(p_arr[i].addr > ending_addr - starting_addr) {
+			p_arr[i].type = 0;
+		}
+        else {
+			p_arr[i].type = 1;
+		}
     }
 
     unsigned int id = 0;
