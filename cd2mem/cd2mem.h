@@ -33,6 +33,7 @@ void set_heap_start(uintptr_t addr);
 void set_heap_end(uintptr_t addr);
 
 
-unsigned long grab_addr(uint64_t rel_start);
+uintptr_t get_val(uintptr_t rel_start);
+uintptr_t to_addr(uintptr_t addr);
 
 #endif
