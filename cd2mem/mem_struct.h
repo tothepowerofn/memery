@@ -6,6 +6,7 @@
 struct mem_struct {
     unsigned int id;
     uintptr_t ptr_offset;
+    unsigned int size;
 };
 
 #endif

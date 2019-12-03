@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
 			if(ds != NULL) {
 				//cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
 				assign_chain_ds(p_arr, index, offset, ds);
+                ds->size += depth;
 			}
 			// belongs to a new data structure
 			else {
@@ -94,7 +95,9 @@ int main(int argc, char *argv[]) {
 				assign_chain_ds(p_arr, index, offset, ds);
                 ds->id = id++;
                 ds->ptr_offset = offset;
+                ds->size = depth;
 			}
+            cout << "Found DS with size " << ds->size << endl;
 
             index = i; // Start at the current pointer we are considering
             while (p_arr[index].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
