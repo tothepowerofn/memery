@@ -107,8 +107,8 @@ int main() {
 	//Make a linked list with variably spaced nodes
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
-	non_consecutive_list(10);
-	//simple_linked_list_test(10,1);
+	//non_consecutive_list(10);
+	simple_linked_list_test(10,1);
 	//simple_cyclic_list(10);
 	sleep(10000);
 }

@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
             struct mem_struct *ds;
 			int depth = find_chain_len(p_arr, index, offset, &ds);
 			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
-			if(depth < MIN_DEPTH) {
+			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
 				//cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
@@ -97,11 +97,11 @@ int main(int argc, char *argv[]) {
                 ds->ptr_offset = offset;
                 ds->size = depth;
 			}
-            cout << "Found DS with size " << ds->size << endl;
+            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 
             index = i; // Start at the current pointer we are considering
             while (p_arr[index].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
-                cout << "Next pointer: (" << p_arr[index].addr << ") at offset " << index << endl;
+                cout << "Next pointer: (" << p_arr[index].addr << ") at index " << index << endl;
                 index = p_arr[index].addr + offset; 
             }
 			cout << "\n" << endl;
