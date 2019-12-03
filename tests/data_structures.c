@@ -48,9 +48,10 @@ void scattered_linked_list(int list_size, int num_lists, int freq_bogus){
 	for (int i = 0; i < num_lists; i++) {
 		struct linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
-			if(random_int(0,1) == 1){
+			if (random_int(0,1) == 1){
 				list = linked_list_append_before(66, list);
-			}else{
+			}
+			else {
 				struct linked_list *new_head = (struct linked_list*) malloc(sizeof(struct linked_list)); //bogus allocation
 				new_head->value = 10; // avoid optimization out
 				--j; // we made a bogus node, so it shouldn't count towards our 10
@@ -106,7 +107,8 @@ int main() {
 	//Make a linked list with variably spaced nodes
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
-	//non_consecutive_list(10);
-	simple_linked_list_test(10,1);
+	non_consecutive_list(10);
+	//simple_linked_list_test(10,1);
+	//simple_cyclic_list(10);
 	sleep(10000);
 }

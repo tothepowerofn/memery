@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
 
     /* copy values from dump */
-    for(uint64_t i = 0; i < num_p; i++) {
+    for (uint64_t i = 0; i < num_p; i++) {
     	uintptr_t val = get_val(i*8);
 		uintptr_t addr = to_addr(val);
 		// initalize values in struct
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 		p_arr[i].ds = NULL;
 		p_arr[i].seeloop = 0;
 		// check if current index is pointer or not
-		if(p_arr[i].addr > ending_addr - starting_addr) {
+		if (p_arr[i].addr > ending_addr - starting_addr) {
 			p_arr[i].type = 0;
 		}
         else {
@@ -76,20 +76,20 @@ int main(int argc, char *argv[]) {
             uintptr_t index = i;
 			/* finds depth of chain with given offset */
 			int depth = find_chain_len(p_arr, index, offset);
-			cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
+			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
 			if(depth < MIN_DEPTH) {
-				cout << "NOT DEEP ENOUGH" << endl;
+				//cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
 			struct mem_struct* ds = find_prev_assigned(p_arr, index, offset);
 			// if the linked list belongs to previously found linked list
 			if(ds != NULL) {
-				cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
+				//cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
 				assign_chain_ds(p_arr, index, offset, ds);
 			}
 			// belongs to a new data structure
 			else {
-				cout << "CREATING NEW DS" << endl;
+				//cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
 				assign_chain_ds(p_arr, index, offset, ds);
                 ds->id = id++;
@@ -101,6 +101,7 @@ int main(int argc, char *argv[]) {
                 cout << "Next pointer: (" << p_arr[index].addr << ") at offset " << index << endl;
                 index = p_arr[index].addr + offset; 
             }
+			cout << "\n" << endl;
         }
     }
     // TODO: Test with larger ds

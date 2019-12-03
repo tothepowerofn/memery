@@ -39,7 +39,10 @@ void set_heap_end(uintptr_t addr){
 }
 
 uintptr_t to_addr(uintptr_t addr) {
+	FILE *fptr = fopen("temp1.txt", "a");
 	uintptr_t potential_addr = addr - (uintptr_t) starting_addr;
+	fprintf(fptr, "Addr: %lu\n", potential_addr);
+	fclose(fptr);
 	return potential_addr / 8;
 }
 	
@@ -59,9 +62,9 @@ uintptr_t get_val(uintptr_t rel_start){
 		}
 		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
 	}
-	uintptr_t lu_res = strtoul(res, NULL, 16);
-	fprintf(fptr, "Value: %lu\n", lu_res);
+	fprintf(fptr, "Value: %s\n", res);
 	fclose(fptr);
+	uintptr_t lu_res = strtoul(res, NULL, 16);
 	return lu_res;
 }
 
@@ -79,12 +82,13 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) 
 	while (p_arr[index].type == 1) { 
 		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
 		if (p_arr[index].seeloop == 1) {
-			cout << "FOUND A LOOP" << endl;
+			//cout << "FOUND A LOOP" << endl;
 			break;
 		}
 		p_arr[index].seeloop = 1;
-		cout << "CURRENT INDEX: " << index << endl;
+		//cout << "CURRENT INDEX: " << index << endl;
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
+		//cout << "NEXT INDEX: " << index << " TYPE: " << p_arr[index].type << endl;
         depth++;
     }
 	reset_seeloop(p_arr, reset_index, offset);
