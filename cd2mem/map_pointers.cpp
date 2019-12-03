@@ -3,6 +3,7 @@
 
 #define MAX_OFFSET 5
 #define MIN_DEPTH 3
+#define MAGIC_NUMBER 0xdeadbeef1337c0de
 
 using namespace std;
 
@@ -61,30 +62,38 @@ int main(int argc, char *argv[]) {
     unsigned int id = 0;
     /* Go through all candidate pointers in p_arr */
     for(uint64_t i = 0; i < num_p; i++) {
-        if (p_arr[i].ds) continue; // If it's already assigned to datastructure
+        if (p_arr[i].ds) continue;
         if (p_arr[i].type == 0) continue; //If it's not a pointer
         for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
             uintptr_t index = i;
             unsigned int depth = 0;
-            while (p_arr[index].type == 1) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
-                cout << offset << endl; 
+            while (p_arr[index].type == 1 && !p_arr[index].ds) { // Count how many pointers we can chase (i.e. nodes in the datastructure)
+                p_arr[index].ds = (struct mem_struct*) MAGIC_NUMBER;
+                cout << offset << endl;
                 index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
                 depth++;
             }
 
-            if (depth >= MIN_DEPTH) {
-                struct mem_struct *ds = (struct mem_struct*) malloc(sizeof(struct mem_struct)); //Create a new datastructure
-                ds->id = id; 
+            struct mem_struct *ds;
+            if (p_arr[index].type == 1 && p_arr[index].ds != (struct mem_struct*) MAGIC_NUMBER && p_arr[index].ds->ptr_offset == offset) { // We have found a part of a pre-existing datastructure
+                ds = p_arr[index].ds;
+            } else { // Create a new datastructure
+                ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
+                ds->id = id++;
                 ds->ptr_offset = offset;
-                cout << "Found a datastructure" << endl;
+            }
+
+            if (depth >= MIN_DEPTH) {
+                if (p_arr[i].ds) {
+                    assert(p_arr[i].ds == ds);
+                    break;
+                }
                 index = i; // Start at the current pointer we are considering
                 while (p_arr[index].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
                     cout << "Next pointer: (" << p_arr[index].addr << ") at offset " << index << endl;
                     p_arr[index].ds = ds;
                     index = p_arr[index].addr + offset; 
                 }
-
-                id++; 
             }
         }
     }
