@@ -76,15 +76,13 @@ int main(int argc, char *argv[]) {
 			/* finds depth of chain with given offset */
             struct mem_struct *ds;
 			int depth = find_chain_len(p_arr, i, offset, &ds);
-			cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
-			cout << "ds: " << ds << " p_arr[i].ds: " << p_arr[i].ds << endl;
+			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
+			//cout << "ds: " << ds << " p_arr[i].ds: " << p_arr[i].ds << endl;
 			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
-				cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
 			// if the linked list belongs to previously found linked list
 			if (ds != NULL) {
-				cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
 				assign_chain_ds(p_arr, i, offset, ds);
 				// if the node we are attaching to is a root then upgrade the root. otherwise create a new root.
 				uintptr_t pointing_to_node = p_arr[i].addr + offset;
@@ -98,11 +96,9 @@ int main(int argc, char *argv[]) {
 			}
 			// belongs to a new data structure
 			else {
-				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
 				ds_list.push_back(ds);
 				assign_chain_ds(p_arr, i, offset, ds);
-				cout << "WHAT IS THE ASSIGNED DS?" << p_arr[i].ds << endl;
     			list<uintptr_t>* roots = new list<uintptr_t>;
                 ds->roots = roots;
 				assign_root(p_arr, i);
@@ -110,38 +106,19 @@ int main(int argc, char *argv[]) {
                 ds->ptr_offset = offset;
                 ds->size = depth;
 			}
-            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
-
-			uintptr_t index = i;
-			cout << i << endl;
-            while (p_arr[i].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
-                cout << "Next pointer: (" << p_arr[i].addr << ") at index " << i << endl;
-                i = p_arr[i].addr + offset; 
-            }
-			for (auto v : *(p_arr[index].ds->roots)) {
-				cout << v << endl;
-			}
+            //cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 			
-			cout << "\n" << endl;
         }
-		// update root list for ds
-		// print function for ds
     }
-	cout << "\n" << endl;
 	// print out entire ds(s) starting from root(s)
 	for (auto i: ds_list) {
 		for (auto j: *(i->roots)){
-			cout << "index : " << j << " p_arr.type: " << p_arr[j].type << endl;
 			while (p_arr[j].type == 1) {
-				cout << "HI MRIDU" << endl;
                	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
                	j = p_arr[j].addr + i->ptr_offset; 
 			}
 		}
 	}
-    // TODO: Test with larger ds
-    // TODO: Only print unique ds
-    // TODO: Print out size of ds
     // TODO: Doubly-linked lists
     // TODO: Differentiating between ds's in mixed program
     // TODO: Binary trees

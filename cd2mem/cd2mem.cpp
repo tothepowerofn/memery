@@ -86,16 +86,13 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
 	while (p_arr[index].type == 1) { 
 		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
 		if (p_arr[index].seeloop == 1) {
-			//cout << "FOUND A LOOP" << endl;
 			break;
 		} else if (p_arr[index].ds) { // we have encountered a pre-existing data structure
             *pre_ds = p_arr[index].ds;
             break;
         }
 		p_arr[index].seeloop = 1;
-		//cout << "CURRENT INDEX: " << index << endl;
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
-		//cout << "NEXT INDEX: " << index << " TYPE: " << p_arr[index].type << endl;
         depth++;
     }
 	reset_seeloop(p_arr, reset_index, offset);
@@ -105,7 +102,7 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
 	uintptr_t reset_index = index;
 	while (p_arr[index].type == 1) { 
-		if (p_arr[index].seeloop == 1 || p_arr[index].ds) {
+		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
 			break;
 		}
 		p_arr[index].seeloop = 1;
@@ -119,18 +116,14 @@ void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
 	// update per struct property
 	p_arr[index].isroot = 1;
 	// update per ds property
-	cout << "ASSIGN ROOT FUNC" << endl;
-	// SEG FAULTING HERE
 	p_arr[index].ds->roots->push_back(index);
 }
 
 void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
-	cout << "UPGRADE ROOT FUNC" << endl;
 	// update per struct property
 	p_arr[pointing_to_node].isroot = 0;
 	p_arr[index].isroot = 1;
 	// update per ds property
-	// SEG FAULTING HERE 
 	p_arr[index].ds->roots->remove(pointing_to_node);
 	p_arr[index].ds->roots->push_back(index);
 }
