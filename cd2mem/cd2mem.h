@@ -17,6 +17,7 @@
 // type 1 = pointer (of some sort)
 struct mem_ptr {
 	int seeloop;
+	int isroot;
 	uintptr_t addr;
 	unsigned int type;
     struct mem_struct *ds;
@@ -40,5 +41,8 @@ uintptr_t to_addr(uintptr_t addr);
 
 int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds);
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds);
+
+void assign_root(struct mem_ptr* p_arr, uintptr_t index); 
+void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node); 
 
 #endif

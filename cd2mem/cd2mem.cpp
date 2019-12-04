@@ -115,4 +115,25 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
 	reset_seeloop(p_arr, reset_index, offset);
 }	
 
+void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
+	std::list<int> wtf;
+	wtf.push_back(1);
+	// update per struct property
+	p_arr[index].isroot = 1;
+	// update per ds property
+	cout << "ASSIGN ROOT FUNC" << endl;
+	cout << "p_arr[index].ds->roots " << p_arr[index].ds->roots.size() << endl;
+	// SEG FAULTING HERE
+	//p_arr[index].ds->testy.push_back(1);
+	//p_arr[index].ds->roots.push_back(p_arr[index].addr);
+}
 
+void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
+	// update per struct property
+	p_arr[pointing_to_node].isroot = 0;
+	p_arr[index].isroot = 1;
+	// update per ds property
+	// SEG FAULTING HERE 
+	//p_arr[index].ds->roots.remove(p_arr[pointing_to_node].addr);
+	//p_arr[index].ds->roots.push_back(p_arr[index].addr);
+}
