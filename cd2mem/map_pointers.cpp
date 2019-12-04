@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned int id = 0;
+    list<uintptr_t>* roots = new list<uintptr_t>;
     /* Go through all candidate pointers in p_arr */
     for(uintptr_t i = 0; i < num_p; i++) {
         if (p_arr[i].ds) continue;
@@ -100,7 +101,6 @@ int main(int argc, char *argv[]) {
 			else {
 				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
-                list<uintptr_t>* roots = new list<uintptr_t>;
                 ds->roots = roots;
 				assign_chain_ds(p_arr, i, offset, ds);
 				assign_root(p_arr, i);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
                 cout << "Next pointer: (" << p_arr[i].addr << ") at index " << i << endl;
                 i = p_arr[i].addr + offset; 
             }
-			for (auto const &v : *(p_arr[i].ds->roots)) {
+			for (auto v : *(p_arr[i].ds->roots)) {
 				cout << v << endl;
 			}
 			
