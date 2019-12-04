@@ -3,13 +3,13 @@
 
 #define MAX_OFFSET 5
 #define MIN_DEPTH 3
-#define MAGIC_NUMBER 0xdeadbeef1337c0de
 
 using namespace std;
 
 uintptr_t starting_addr;
 uintptr_t ending_addr;
 char* memblock;
+std::list<struct mem_struct*> ds_list;
 
 void usage() {
     cout << "This program does first scan analysis of pointers in the heap of the core" << endl
@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
 			else {
 				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
+				ds_list.push_back(ds);
 				assign_chain_ds(p_arr, i, offset, ds);
 				cout << "WHAT IS THE ASSIGNED DS?" << p_arr[i].ds << endl;
     			list<uintptr_t>* roots = new list<uintptr_t>;
@@ -112,6 +113,7 @@ int main(int argc, char *argv[]) {
             cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 
 			uintptr_t index = i;
+			cout << i << endl;
             while (p_arr[i].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
                 cout << "Next pointer: (" << p_arr[i].addr << ") at index " << i << endl;
                 i = p_arr[i].addr + offset; 
@@ -125,6 +127,18 @@ int main(int argc, char *argv[]) {
 		// update root list for ds
 		// print function for ds
     }
+	cout << "\n" << endl;
+	// print out entire ds(s) starting from root(s)
+	for (auto i: ds_list) {
+		for (auto j: *(i->roots)){
+			cout << "index : " << j << " p_arr.type: " << p_arr[j].type << endl;
+			while (p_arr[j].type == 1) {
+				cout << "HI MRIDU" << endl;
+               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
+               	j = p_arr[j].addr + i->ptr_offset; 
+			}
+		}
+	}
     // TODO: Test with larger ds
     // TODO: Only print unique ds
     // TODO: Print out size of ds
