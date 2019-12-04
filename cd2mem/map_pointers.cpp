@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 				cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
 				assign_chain_ds(p_arr, i, offset, ds);
 				// if the node we are attaching to is a root then upgrade the root. otherwise create a new root.
-				uintptr_t pointing_to_node = p_arr[i].addr;
+				uintptr_t pointing_to_node = p_arr[i].addr + offset;
 				if (p_arr[pointing_to_node].isroot == 1) {
 					upgrade_root(p_arr, i, pointing_to_node);
 				}
@@ -100,10 +100,8 @@ int main(int argc, char *argv[]) {
 			else {
 				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
-                list<uintptr_t>* temp_roots = new list<uintptr_t>;
-                list<int>* temp_testy = new list<int>;
-                ds->roots = temp_roots;
-                ds->testy = temp_testy;
+                list<uintptr_t>* roots = new list<uintptr_t>;
+                ds->roots = roots;
 				assign_chain_ds(p_arr, i, offset, ds);
 				assign_root(p_arr, i);
                 ds->id = id++;
@@ -116,6 +114,10 @@ int main(int argc, char *argv[]) {
                 cout << "Next pointer: (" << p_arr[i].addr << ") at index " << i << endl;
                 i = p_arr[i].addr + offset; 
             }
+			for (auto const &v : *(p_arr[i].ds->roots)) {
+				cout << v << endl;
+			}
+			
 			cout << "\n" << endl;
         }
 		// update root list for ds
