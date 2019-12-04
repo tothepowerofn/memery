@@ -122,10 +122,10 @@ void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
 	p_arr[index].isroot = 1;
 	// update per ds property
 	cout << "ASSIGN ROOT FUNC" << endl;
-	cout << "p_arr[index].ds->roots " << p_arr[index].ds->roots.size() << endl;
+	cout << "p_arr[index].ds->roots " << p_arr[index].ds->roots->size() << endl;
 	// SEG FAULTING HERE
-	//p_arr[index].ds->testy.push_back(1);
-	//p_arr[index].ds->roots.push_back(p_arr[index].addr);
+	p_arr[index].ds->testy->push_back(1);
+	p_arr[index].ds->roots->push_back(p_arr[index].addr);
 }
 
 void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
@@ -134,6 +134,6 @@ void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_
 	p_arr[index].isroot = 1;
 	// update per ds property
 	// SEG FAULTING HERE 
-	//p_arr[index].ds->roots.remove(p_arr[pointing_to_node].addr);
-	//p_arr[index].ds->roots.push_back(p_arr[index].addr);
+	p_arr[index].ds->roots->remove(p_arr[pointing_to_node].addr);
+	p_arr[index].ds->roots->push_back(p_arr[index].addr);
 }

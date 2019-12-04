@@ -11,8 +11,8 @@ struct mem_struct {
     unsigned int id;
     uintptr_t ptr_offset;
     unsigned int size;
-	std::list<uintptr_t> roots;
-	std::list<int> testy;
+	std::list<uintptr_t>* roots;
+	std::list<int>* testy;
 };
 
 #endif

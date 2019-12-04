@@ -100,6 +100,10 @@ int main(int argc, char *argv[]) {
 			else {
 				cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
+                list<uintptr_t>* temp_roots = new list<uintptr_t>;
+                list<int>* temp_testy = new list<int>;
+                ds->roots = temp_roots;
+                ds->testy = temp_testy;
 				assign_chain_ds(p_arr, i, offset, ds);
 				assign_root(p_arr, i);
                 ds->id = id++;
