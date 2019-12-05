@@ -132,7 +132,7 @@ void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t o
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "CURRENT STRUCT AT FILE OFFSET: " << index << endl;
 	for (int i = 0; i < offset; i++) {
-		uintptr_t elt = get_val((index+i)*8);	
+		uintptr_t elt = get_val((index+i-offset)*8);	
 		cout << "ELEMENT " << i << " IN STRUCT: " << elt << endl;
 	}	
 }
