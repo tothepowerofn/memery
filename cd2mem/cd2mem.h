@@ -45,4 +45,6 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
 void assign_root(struct mem_ptr* p_arr, uintptr_t index); 
 void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node); 
 
+int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii);
+
 #endif
