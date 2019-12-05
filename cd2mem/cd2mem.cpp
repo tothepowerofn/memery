@@ -2,13 +2,14 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <iostream>
+
 #define PTR_SIZE 8
+
 using namespace std;
 
 extern uintptr_t starting_addr;
 extern uintptr_t ending_addr;
 extern char* memblock;
-
 
 uintptr_t ascii_hex_to_ptr(char* hexstring){
     return (uintptr_t)strtol(hexstring, NULL, 0);
@@ -39,7 +40,7 @@ void set_heap_end(uintptr_t addr){
 }
 
 uintptr_t to_addr(uintptr_t addr) {
-	FILE *fptr = fopen("temp1.txt", "a");
+	FILE *fptr = fopen("cd2mem.log", "a");
 	uintptr_t potential_addr = addr - (uintptr_t) starting_addr;
 	fprintf(fptr, "Addr: %lu\n", potential_addr);
 	fclose(fptr);
@@ -48,7 +49,7 @@ uintptr_t to_addr(uintptr_t addr) {
 	
 // will grab the next 8 bytes of mem block
 uintptr_t get_val(uintptr_t rel_start){
-	FILE *fptr = fopen("temp.txt", "a");
+	FILE *fptr = fopen("cd2mem.log", "a");
 	char res[19];
 	memset(res, 0, 19);
 	sprintf(res + strlen(res), "%s", "0x");
@@ -68,64 +69,25 @@ uintptr_t get_val(uintptr_t rel_start){
 	return lu_res;
 }
 
-void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
-	while (p_arr[index].type == 1 && p_arr[index].seeloop) {
-		p_arr[index].seeloop = 0;
-		index = p_arr[index].addr + offset;
-	}
-}
-
-int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds) {
-	int depth = 0;
-	uintptr_t reset_index = index;
-
-    // *ds stores second return value --- pre-existing data structure
-    *pre_ds = NULL;
-
-	// Count how many pointers we can chase (i.e. nodes in the data structure)
-	while (p_arr[index].type == 1) { 
-		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
-		if (p_arr[index].seeloop == 1) {
-			break;
-		} else if (p_arr[index].ds) { // we have encountered a pre-existing data structure
-            *pre_ds = p_arr[index].ds;
-            break;
-        }
-		p_arr[index].seeloop = 1;
-        index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
-        depth++;
-    }
-	reset_seeloop(p_arr, reset_index, offset);
-	return depth;
-}
-
-void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
-	uintptr_t reset_index = index;
-	while (p_arr[index].type == 1) { 
-		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
-			break;
+void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
+    /* copy values from dump */
+    for (uint64_t i = 0; i < num_p; i++) {
+    	uintptr_t val = get_val(i*8);
+		uintptr_t addr = to_addr(val);
+		// initalize values in struct
+    	p_arr[i].addr = addr;
+		p_arr[i].ds = NULL;
+		p_arr[i].seeloop = 0;
+		// check if current index is pointer or not
+		if (p_arr[i].addr > ending_addr - starting_addr) {
+			p_arr[i].type = 0;
 		}
-		p_arr[index].seeloop = 1;
-		p_arr[index].ds = ds;
-        index = p_arr[index].addr + offset;
+        else {
+			p_arr[i].type = 1;
+			cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
+			cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
+		}
     }
-	reset_seeloop(p_arr, reset_index, offset);
-}	
-
-void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
-	// update per struct property
-	p_arr[index].isroot = 1;
-	// update per ds property
-	p_arr[index].ds->roots->push_back(index);
-}
-
-void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
-	// update per struct property
-	p_arr[pointing_to_node].isroot = 0;
-	p_arr[index].isroot = 1;
-	// update per ds property
-	p_arr[index].ds->roots->remove(pointing_to_node);
-	p_arr[index].ds->roots->push_back(index);
 }
 
 //mem = memory to test to see if string, acceptable_chars = ascii chars to accept, num_consec_ascii

@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 int random_int(int min, int max)
 {
@@ -34,7 +35,9 @@ void simple_linked_list_test(int list_size, int num_lists){
 	for (int i = 0; i < num_lists; i++) {
 		struct linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
-			list = linked_list_append_before(66, list);
+			list = linked_list_append_before(100+j, list);
+			uint64_t* i_output = (uint64_t*) list;
+			printf("%lu", *i_output);
 		}
 	}
 }
@@ -98,7 +101,22 @@ void simple_cyclic_list(int list_size){ //does a simple chain of nodes but links
 			head = list;
 		}
 	}
-	list->next = head; //link the last node back to the first
+	head->next = list; //link the last node back to the first
+}
+
+
+int simple_linked_tree_helper(int depth, int n, struct linked_list *root) {
+    if (depth == 0) return n;
+    struct linked_list *left = linked_list_append_before(n++, root);
+    struct linked_list *right = linked_list_append_before(n++, root);
+    n = simple_linked_tree_helper(depth-1, n, left);
+    n = simple_linked_tree_helper(depth-1, n, right);
+    return n;
+}
+
+void simple_linked_tree(int depth) { // makes a binary tree with a given depth (every node points to its parent)
+    struct linked_list *root = linked_list_append_before(1, NULL);
+    simple_linked_tree_helper(depth, 2, root);
 }
 
 int main() {
@@ -108,7 +126,8 @@ int main() {
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
-	simple_linked_list_test(10,1);
+	//simple_linked_list_test(10,1);
+    simple_linked_tree(4);
 	//simple_cyclic_list(10);
 	sleep(10000);
 }
