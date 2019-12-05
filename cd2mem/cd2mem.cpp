@@ -162,12 +162,15 @@ void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t o
 
 int correct_size(struct mem_ptr* p_arr, uintptr_t index){
 	// if circular then don't do anything
-	
+	uintptr_t reset_index = index;
 	while (p_arr[index].type == 1) {
 		if (p_arr[index].seeloop == 1) {
+			reset_seeloop(p_arr, reset_index, p_arr[index].ds->ptr_offset);
 			return 0;
 		}
+		p_arr[index].seeloop = 1;
 		index = p_arr[index].addr + p_arr[index].ds->ptr_offset;
 	}
+	reset_seeloop(p_arr, reset_index, p_arr[index].ds->ptr_offset);
 	return 1;
 }
