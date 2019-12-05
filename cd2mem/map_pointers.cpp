@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
 	// print out entire ds(s) starting from root(s)
 	for (auto i: *(ds_list)) {
         finalize_nodes(p_arr, i);
+        cout << i->nodes->size() << endl;
         pretty_print_struct(p_arr, i);
 	}
 

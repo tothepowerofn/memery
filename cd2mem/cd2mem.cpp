@@ -84,8 +84,8 @@ void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
 		}
         else {
 			p_arr[i].type = 1;
-			cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
-			cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
+			//cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
+			//cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}
     }
 }

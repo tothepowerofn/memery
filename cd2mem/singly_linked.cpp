@@ -77,7 +77,8 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
             p_arr[j].seeloop = 1;
             j = p_arr[j].addr + ds->ptr_offset;
         }
-        if (p_arr[j].type == 0) {
+        if (p_arr[j].type == 0 && !p_arr[j].seeloop) {
+            p_arr[j].seeloop = 1;
             ds->nodes->push_back(j-ds->ptr_offset);
         }
 	}
@@ -88,13 +89,15 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
 
 void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
-	cout << "\tEntry @ (" << index << ") -> (";
-    if (p_arr[index+ds->ptr_offset].type == 1) cout << p_arr[index+ds->ptr_offset].addr << ")" << endl;
-    else cout << "non-pointer)" << endl;
+	cout << "  (" << index << ") -> (";
+    if (p_arr[index+ds->ptr_offset].type == 1) cout << p_arr[index+ds->ptr_offset].addr;
+    else cout << "---";
+    cout << "): ||";
 	for (int i = 0; i < ds->ptr_offset; i++) {
 		uintptr_t elt = get_val((index+i)*8);	
-		cout << "\t\t" << elt << " (int)" << endl;
+		cout << " " << elt << " (int) || ";
     }
+    cout << endl;
 }
 
 void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
@@ -102,6 +105,7 @@ void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
     for (auto j: *(ds->nodes)) {
         pretty_print_struct_entry(p_arr, j, ds);
     }
+    cout << endl;
 }
 
 int correct_size(struct mem_ptr* p_arr, uintptr_t index){
@@ -161,9 +165,9 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
                 ds->ptr_offset = offset;
 				int correction = correct_size(p_arr, i);
                 ds->size = depth+correction;
-                cout << "Created new DS" << endl;
+//                cout << "Created new DS" << endl;
 			}
-            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
+//            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 			
         }
     }
