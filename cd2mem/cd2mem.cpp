@@ -95,6 +95,7 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
         depth++;
     }
+	// fixing the last node situation
     if (p_arr[index].ds) {
         *pre_ds = p_arr[index].ds;
     }
@@ -157,4 +158,16 @@ void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t o
 		uintptr_t elt = get_val((index+i)*8);	
 		cout << "\t\t" << elt << " (int)" << endl;
     }
+}
+
+int correct_size(struct mem_ptr* p_arr, uintptr_t index){
+	// if circular then don't do anything
+	
+	while (p_arr[index].type == 1) {
+		if (p_arr[index].seeloop == 1) {
+			return 0;
+		}
+		index = p_arr[index].addr + p_arr[index].ds->ptr_offset;
+	}
+	return 1;
 }

@@ -106,7 +106,8 @@ int main(int argc, char *argv[]) {
 				assign_root(p_arr, i);
                 ds->id = id++;
                 ds->ptr_offset = offset;
-                ds->size = depth;
+				int correction = correct_size(p_arr, i);
+                ds->size = depth+correction;
                 cout << "Created new DS" << endl;
 			}
             cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
