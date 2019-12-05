@@ -101,8 +101,9 @@ void simple_cyclic_list(int list_size){ //does a simple chain of nodes but links
 			head = list;
 		}
 	}
-	list->next = head; //link the last node back to the first
+	head->next = list; //link the last node back to the first
 }
+
 
 int simple_linked_tree_helper(int depth, int n, struct linked_list *root) {
     if (depth == 0) return n;
