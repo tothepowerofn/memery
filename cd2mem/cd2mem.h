@@ -1,7 +1,7 @@
 #ifndef __CD2MEM_H
 #define __CD2MEM_H
 
-#include "mem_struct.h"
+#include "data_structures.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,17 +34,9 @@ uintptr_t heap_end();
 void set_heap_start(uintptr_t addr);
 void set_heap_end(uintptr_t addr);
 
-
 uintptr_t get_val(uintptr_t rel_start);
 uintptr_t to_addr(uintptr_t addr);
 
+void init_pointers(struct mem_ptr *p_arr, unsigned int num_p);
 
-int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds);
-void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds);
-
-void assign_root(struct mem_ptr* p_arr, uintptr_t index); 
-void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node); 
-void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds);
-void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset);
-int correct_size(struct mem_ptr* p_arr, uintptr_t index);
 #endif
