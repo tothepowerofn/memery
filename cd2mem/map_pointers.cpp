@@ -3,6 +3,7 @@
 
 #include "cd2mem.h"
 #include "singly_linked.h"
+#include "exploit.h"
 
 using namespace std;
 
@@ -20,32 +21,11 @@ void usage() {
 }
 
 int main(int argc, char *argv[]) {
-    int fd;
-    struct stat sb;
-
-    if(argc != 4) {
-		usage();
-        exit(0);
-    }
-   
-	/* open file and set starting/ending addresses */ 
-    fd = open(argv[1], O_RDONLY);
-    starting_addr = ascii_hex_to_ptr(argv[2]);
-    ending_addr = ascii_hex_to_ptr(argv[3]) + sizeof(uintptr_t);
-    cout << "Specified addresses from " << starting_addr << " to " << ending_addr << endl;
-
-	/* size of heap core dump */	
-    fstat(fd, &sb);
-    cout << "Size of dump: " << (uint64_t)sb.st_size << "\n";
-
-	/* map heap core dump into memory */
-    memblock = (char*)mmap(NULL, sb.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
-    if (memblock == MAP_FAILED) {
-        cout << "Failed to mmap :(" << endl;
-    }
+	starting_addr = exploit_startaddr();
+	ending_addr = exploit_endaddr();
 
     /* number of and array of qwords in heap memory */
-	long num_p = ((sb.st_size / 8) + 1);
+	long num_p = (((HEAP_SIZE*2) / 8) + 1);
     assert(num_p == (ending_addr - starting_addr) / 8);
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
 

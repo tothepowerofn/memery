@@ -1,4 +1,5 @@
 #include "cd2mem.h"
+#include "exploit.h"
 #include <memory.h>
 #include <stdlib.h>
 #include <iostream>
@@ -72,8 +73,10 @@ uintptr_t get_val(uintptr_t rel_start){
 void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
     /* copy values from dump */
     for (uint64_t i = 0; i < num_p; i++) {
-    	uintptr_t val = get_val(i*8);
-		uintptr_t addr = to_addr(val);
+		// call read_8bytes to get the next 8 bytes of the heap starting at i
+		uintptr_t 8byte = read_8bytes(i);
+    	//uintptr_t val = get_val(8byte*8);
+		uintptr_t addr = to_addr(8byte);
 		// initalize values in struct
     	p_arr[i].addr = addr;
 		p_arr[i].ds = NULL;

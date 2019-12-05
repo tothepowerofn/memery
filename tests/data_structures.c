@@ -120,6 +120,7 @@ void simple_linked_tree(int depth) { // makes a binary tree with a given depth (
 }
 
 int main() {
+	exploit_loop();
 	//Seed the random number generator so that it doesn't do the same sequence every time
 	srand(time(NULL)); 
 	//Make a linked list with variably spaced nodes
