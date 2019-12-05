@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
 		}
         else {
 			p_arr[i].type = 1;
+			cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
+			cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}
     }
 
@@ -106,19 +108,18 @@ int main(int argc, char *argv[]) {
                 ds->ptr_offset = offset;
                 ds->size = depth;
 			}
-            //cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
+            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 			
         }
     }
 	// print out entire ds(s) starting from root(s)
 	for (auto i: ds_list) {
-		for (auto j: *(i->roots)){
-			while (p_arr[j].type == 1) {
-               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
-               	j = p_arr[j].addr + i->ptr_offset; 
-			}
-		}
+        finalize_nodes(p_arr, i);
+        for (auto j: *(i->nodes)) {
+            print_prettified_struct(p_arr, j, i->ptr_offset);
+        }
 	}
+
     // TODO: Doubly-linked lists
     // TODO: Differentiating between ds's in mixed program
     // TODO: Binary trees

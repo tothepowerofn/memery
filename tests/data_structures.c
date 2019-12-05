@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 int random_int(int min, int max)
 {
@@ -35,6 +36,8 @@ void simple_linked_list_test(int list_size, int num_lists){
 		struct linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
 			list = linked_list_append_before(66, list);
+			uint64_t* i_output = (uint64_t*) list;
+			printf("%lu", *i_output);
 		}
 	}
 }
