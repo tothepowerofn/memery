@@ -89,3 +89,21 @@ void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
 		}
     }
 }
+
+//mem = memory to test to see if string, acceptable_chars = ascii chars to accept, num_consec_ascii
+// = number of acceptable consecutive ascii required to be classified as string.
+int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii){
+	for(int i = 0; i<num_consec_ascii; ++i){
+		int round_passed = 0;
+		for(int j = 0;j<strlen(acceptable_chars); ++j){
+			if(mem[i] == acceptable_chars[j]){
+				round_passed = 1;
+			}
+		}
+		if(round_passed == 0){
+			return 0;
+		}
+	}
+	return 1;
+}
+

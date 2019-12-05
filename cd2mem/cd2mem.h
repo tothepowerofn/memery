@@ -39,4 +39,6 @@ uintptr_t to_addr(uintptr_t addr);
 
 void init_pointers(struct mem_ptr *p_arr, unsigned int num_p);
 
+int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii);
+
 #endif
