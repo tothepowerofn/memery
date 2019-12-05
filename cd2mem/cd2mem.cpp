@@ -127,3 +127,12 @@ void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_
 	p_arr[index].ds->roots->remove(pointing_to_node);
 	p_arr[index].ds->roots->push_back(index);
 }
+
+void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset) {
+	// print out values between top of struct and first heap pointer in struct 
+	cout << "CURRENT STRUCT AT FILE OFFSET: " << index << endl;
+	for (int i = 0; i < offset; i++) {
+		uintptr_t elt = get_val((index+i)*8);	
+		cout << "ELEMENT " << i << " IN STRUCT: " << elt << endl;
+	}	
+}

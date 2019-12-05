@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
 		}
         else {
 			p_arr[i].type = 1;
+			cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
+			cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}
     }
 
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
                 ds->ptr_offset = offset;
                 ds->size = depth;
 			}
-            //cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
+            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 			
         }
     }
@@ -114,6 +116,17 @@ int main(int argc, char *argv[]) {
 	for (auto i: ds_list) {
 		for (auto j: *(i->roots)){
 			while (p_arr[j].type == 1) {
+               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
+               	j = p_arr[j].addr + i->ptr_offset; 
+			}
+		}
+	}
+
+	for (auto i: ds_list) {
+		uintptr_t offset = i->ptr_offset;
+		for (auto j: *(i->roots)){
+			while (p_arr[j].type == 1) {
+				print_prettified_struct(p_arr, j, offset);
                	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
                	j = p_arr[j].addr + i->ptr_offset; 
 			}
