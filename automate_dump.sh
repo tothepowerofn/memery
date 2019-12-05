@@ -13,7 +13,10 @@ addr_start=${addr_list[0]}
 addr_end=${addr_list[1]}
 echo $addr_start
 echo $addr_end
-rm -f gdb_commands
-echo -e "dump binary memory /tmp/memery_dump.bin $addr_start $addr_end\nquit" >> /tmp/gdb_commands
-gdb -p $process_id --command=/tmp/gdb_commands 
-./bin/map_pointers /tmp/memery_dump.bin $addr_start $addr_end
+
+rm -rf /tmp/memery
+mkdir /tmp/memery
+
+echo -e "dump binary memory /tmp/memery/dump.bin $addr_start $addr_end\nquit" >> /tmp/memery/gdb_commands
+gdb -p $process_id --command=/tmp/memery/gdb_commands 
+./bin/map_pointers /tmp/memery/dump.bin $addr_start $addr_end
