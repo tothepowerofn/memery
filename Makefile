@@ -1,5 +1,5 @@
 COMPILER=g++
-CFLAGS=-g -I cd2mem -I tests
+CFLAGS=-g -I cd2mem -I tests -std=c++11 
 
 .PHONY: all clean cd2mem map_pointers tests
 

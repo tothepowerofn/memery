@@ -3,13 +3,13 @@
 
 #define MAX_OFFSET 5
 #define MIN_DEPTH 3
-#define MAGIC_NUMBER 0xdeadbeef1337c0de
 
 using namespace std;
 
 uintptr_t starting_addr;
 uintptr_t ending_addr;
 char* memblock;
+std::list<struct mem_struct*> ds_list;
 
 void usage() {
     cout << "This program does first scan analysis of pointers in the heap of the core" << endl
@@ -69,50 +69,60 @@ int main(int argc, char *argv[]) {
 
     unsigned int id = 0;
     /* Go through all candidate pointers in p_arr */
-    for(uint64_t i = 0; i < num_p; i++) {
+    for(uintptr_t i = 0; i < num_p; i++) {
         if (p_arr[i].ds) continue;
         if (p_arr[i].type == 0) continue; //If it's not a pointer
         for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
-            uintptr_t index = i;
 			/* finds depth of chain with given offset */
             struct mem_struct *ds;
-			int depth = find_chain_len(p_arr, index, offset, &ds);
+			int depth = find_chain_len(p_arr, i, offset, &ds);
 			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
+			//cout << "ds: " << ds << " p_arr[i].ds: " << p_arr[i].ds << endl;
 			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
-				//cout << "NOT DEEP ENOUGH" << endl;
 				continue;
 			}
 			// if the linked list belongs to previously found linked list
-			if(ds != NULL) {
-				//cout << "BELONGS TO PREVIOUSLY FOUND LINKED LIST" << endl;
-				assign_chain_ds(p_arr, index, offset, ds);
+			if (ds != NULL) {
+				assign_chain_ds(p_arr, i, offset, ds);
+				// if the node we are attaching to is a root then upgrade the root. otherwise create a new root.
+				uintptr_t pointing_to_node = p_arr[i].addr + offset;
+				if (p_arr[pointing_to_node].isroot == 1) {
+					upgrade_root(p_arr, i, pointing_to_node);
+				}
+				else {
+					assign_root(p_arr, i);
+				}
                 ds->size += depth;
 			}
 			// belongs to a new data structure
 			else {
-				//cout << "CREATING NEW DS" << endl;
                 ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
-				assign_chain_ds(p_arr, index, offset, ds);
+				ds_list.push_back(ds);
+				assign_chain_ds(p_arr, i, offset, ds);
+    			list<uintptr_t>* roots = new list<uintptr_t>;
+                ds->roots = roots;
+				assign_root(p_arr, i);
                 ds->id = id++;
                 ds->ptr_offset = offset;
                 ds->size = depth;
 			}
-            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
-
-            index = i; // Start at the current pointer we are considering
-            while (p_arr[index].type == 1) { // Chase pointers like above and print the pointer to the next node in the current node
-                cout << "Next pointer: (" << p_arr[index].addr << ") at index " << index << endl;
-                index = p_arr[index].addr + offset; 
-            }
-			cout << "\n" << endl;
+            //cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
+			
         }
     }
-    // TODO: Test with larger ds
-    // TODO: Only print unique ds
-    // TODO: Print out size of ds
+	// print out entire ds(s) starting from root(s)
+	for (auto i: ds_list) {
+		for (auto j: *(i->roots)){
+			while (p_arr[j].type == 1) {
+               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
+               	j = p_arr[j].addr + i->ptr_offset; 
+			}
+		}
+	}
     // TODO: Doubly-linked lists
     // TODO: Differentiating between ds's in mixed program
     // TODO: Binary trees
+	// TODO: Detect function pointers?!
     // TODO: How to fine-tune depth/offsets? Ask Mickens.
 
     /* Meeting 12-2-2019 */
@@ -124,7 +134,7 @@ int main(int argc, char *argv[]) {
     // TODO: Pretty-print different data structures (singly,doubly, etc.) and properties
     // TODO: Detect invariants 
 
-    // TODO: Dump RO segment (Nathan)
+    // TODO: Dump RO segment (Nathan) <-- WE CANT DO THIS!!!! NOT IN THE ASSUMPTIONS WE MAKE (ONLY LEAK HEAP)
     // TODO: Detect pointers to RO segment (Nathan)
 
     cout << endl;
