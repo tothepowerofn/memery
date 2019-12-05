@@ -44,6 +44,6 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
 
 void assign_root(struct mem_ptr* p_arr, uintptr_t index); 
 void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node); 
-
+void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds);
 void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset);
 #endif

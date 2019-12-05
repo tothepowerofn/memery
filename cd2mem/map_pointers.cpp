@@ -114,24 +114,12 @@ int main(int argc, char *argv[]) {
     }
 	// print out entire ds(s) starting from root(s)
 	for (auto i: ds_list) {
-		for (auto j: *(i->roots)){
-			while (p_arr[j].type == 1) {
-               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
-               	j = p_arr[j].addr + i->ptr_offset; 
-			}
-		}
+        finalize_nodes(p_arr, i);
+        for (auto j: *(i->nodes)) {
+            print_prettified_struct(p_arr, j, i->ptr_offset);
+        }
 	}
 
-	for (auto i: ds_list) {
-		uintptr_t offset = i->ptr_offset;
-		for (auto j: *(i->roots)){
-			while (p_arr[j].type == 1) {
-				print_prettified_struct(p_arr, j, offset);
-               	cout << "Next pointer: (" << p_arr[j].addr << ") at index " << j << endl;
-               	j = p_arr[j].addr + i->ptr_offset; 
-			}
-		}
-	}
     // TODO: Doubly-linked lists
     // TODO: Differentiating between ds's in mixed program
     // TODO: Binary trees

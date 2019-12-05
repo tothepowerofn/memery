@@ -12,6 +12,7 @@ struct mem_struct {
     uintptr_t ptr_offset;
     unsigned int size;
 	std::list<uintptr_t>* roots;
+    std::list<uintptr_t>* nodes;
 	std::list<int>* testy;
 };
 

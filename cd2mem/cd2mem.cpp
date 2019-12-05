@@ -128,11 +128,26 @@ void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_
 	p_arr[index].ds->roots->push_back(index);
 }
 
+void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
+    list<uintptr_t>* nodes = new list<uintptr_t>;
+    ds->nodes = nodes;
+	for (auto j: *(ds->roots)) {
+        while (p_arr[j].type == 1 && !p_arr[j].seeloop) {
+            ds->nodes->push_back(j-ds->ptr_offset);
+            p_arr[j].seeloop = 1;
+            j = p_arr[j].addr + ds->ptr_offset;
+        }
+	}
+    for (auto j: *(ds->roots)) {
+        reset_seeloop(p_arr, j, ds->ptr_offset);
+    }
+}
+
 void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset) {
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "CURRENT STRUCT AT FILE OFFSET: " << index << endl;
 	for (int i = 0; i < offset; i++) {
-		uintptr_t elt = get_val((index+i-offset)*8);	
+		uintptr_t elt = get_val((index+i)*8);	
 		cout << "ELEMENT " << i << " IN STRUCT: " << elt << endl;
 	}	
 }
