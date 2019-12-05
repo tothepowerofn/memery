@@ -161,9 +161,9 @@ void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t o
 }
 
 int correct_size(struct mem_ptr* p_arr, uintptr_t index){
-	// if circular then don't do anything
 	uintptr_t reset_index = index;
 	while (p_arr[index].type == 1) {
+		// if circular then last node will be marked as type 1, so correction is 0
 		if (p_arr[index].seeloop == 1) {
 			reset_seeloop(p_arr, reset_index, p_arr[index].ds->ptr_offset);
 			return 0;
