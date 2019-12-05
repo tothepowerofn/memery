@@ -75,6 +75,6 @@ bool mem2file (std::string const & filename, char const * data, size_t const byt
 //to a file, calling a python script that uses ndisasm to look at the assembly to
 //see if the first instructions follow conventions, and then outputting that result
 bool is_func_ptr(char* mem, size_t sz){
-    mem2file("testfunc", mem, sz);
+    mem2file("testfunc", mem, sz); //NOTE: we always save the memory as file named testfunc in the bin folder
     return stoi(exec_command("python3 ../cd2mem/funcptrclassify.py")) == 1;
 }
