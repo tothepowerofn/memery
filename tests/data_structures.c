@@ -1,4 +1,6 @@
 #include "data_structures.h"
+#include "exploit.h"
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -129,5 +131,5 @@ int main() {
 	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
 	simple_cyclic_list(10);
-	sleep(10000);
+    exploit_loop();
 }

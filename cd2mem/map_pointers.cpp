@@ -2,6 +2,7 @@
 #include <list>
 
 #include "cd2mem.h"
+#include "exploit.h"
 #include "singly_linked.h"
 
 using namespace std;
@@ -20,6 +21,9 @@ void usage() {
 }
 
 int main(int argc, char *argv[]) {
+    setup_exploit();
+    return 0;
+
     int fd;
     struct stat sb;
 
