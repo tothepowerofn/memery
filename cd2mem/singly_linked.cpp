@@ -86,12 +86,21 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
     }
 }
 
-void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset) {
+void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
-	cout << "\tEntry @ (" << index << ")" << endl;
-	for (int i = 0; i < offset; i++) {
+	cout << "\tEntry @ (" << index << ") -> (";
+    if (p_arr[index+ds->ptr_offset].type == 1) cout << p_arr[index+ds->ptr_offset].addr << ")" << endl;
+    else cout << "non-pointer)" << endl;
+	for (int i = 0; i < ds->ptr_offset; i++) {
 		uintptr_t elt = get_val((index+i)*8);	
 		cout << "\t\t" << elt << " (int)" << endl;
+    }
+}
+
+void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
+    cout << "Struct [size " << ds->size << "]" << endl;
+    for (auto j: *(ds->nodes)) {
+        pretty_print_struct_entry(p_arr, j, ds);
     }
 }
 

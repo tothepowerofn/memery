@@ -56,10 +56,7 @@ int main(int argc, char *argv[]) {
 	// print out entire ds(s) starting from root(s)
 	for (auto i: *(ds_list)) {
         finalize_nodes(p_arr, i);
-        cout << "Struct [" << i->size << "]" << endl;
-        for (auto j: *(i->nodes)) {
-            print_prettified_struct(p_arr, j, i->ptr_offset);
-        }
+        pretty_print_struct(p_arr, i);
 	}
 
     // TODO: Doubly-linked lists
