@@ -2,6 +2,7 @@
 #include <list>
 
 #include "cd2mem.h"
+#include "exploit.h"
 #include "singly_linked.h"
 #include "exploit.h"
 
@@ -21,6 +22,7 @@ void usage() {
 }
 
 int main(int argc, char *argv[]) {
+    setup_exploit();
 	starting_addr = exploit_startaddr();
 	ending_addr = exploit_endaddr();
 
