@@ -95,6 +95,9 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
         index = p_arr[index].addr + offset; // we should find a pointer at the pointed-to address plus offset
         depth++;
     }
+    if (p_arr[index].ds) {
+        *pre_ds = p_arr[index].ds;
+    }
 	reset_seeloop(p_arr, reset_index, offset);
 	return depth;
 }
@@ -109,6 +112,7 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
 		p_arr[index].ds = ds;
         index = p_arr[index].addr + offset;
     }
+    p_arr[index].ds = ds;
 	reset_seeloop(p_arr, reset_index, offset);
 }	
 
@@ -137,6 +141,9 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
             p_arr[j].seeloop = 1;
             j = p_arr[j].addr + ds->ptr_offset;
         }
+        if (p_arr[j].type == 0) {
+            ds->nodes->push_back(j-ds->ptr_offset);
+        }
 	}
     for (auto j: *(ds->roots)) {
         reset_seeloop(p_arr, j, ds->ptr_offset);
@@ -145,9 +152,9 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
 
 void print_prettified_struct(struct mem_ptr* p_arr, uintptr_t index, uintptr_t offset) {
 	// print out values between top of struct and first heap pointer in struct 
-	cout << "CURRENT STRUCT AT FILE OFFSET: " << index << endl;
+	cout << "\tEntry @ (" << index << ")" << endl;
 	for (int i = 0; i < offset; i++) {
 		uintptr_t elt = get_val((index+i)*8);	
-		cout << "ELEMENT " << i << " IN STRUCT: " << elt << endl;
-	}	
+		cout << "\t\t" << elt << " (int)" << endl;
+    }
 }

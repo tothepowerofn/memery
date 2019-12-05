@@ -2,7 +2,7 @@
 #include "assert.h"
 
 #define MAX_OFFSET 5
-#define MIN_DEPTH 3
+#define MIN_DEPTH 2
 
 using namespace std;
 
@@ -107,6 +107,7 @@ int main(int argc, char *argv[]) {
                 ds->id = id++;
                 ds->ptr_offset = offset;
                 ds->size = depth;
+                cout << "Created new DS" << endl;
 			}
             cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
 			
@@ -115,6 +116,7 @@ int main(int argc, char *argv[]) {
 	// print out entire ds(s) starting from root(s)
 	for (auto i: ds_list) {
         finalize_nodes(p_arr, i);
+        cout << "Struct [" << i->size << "]" << endl;
         for (auto j: *(i->nodes)) {
             print_prettified_struct(p_arr, j, i->ptr_offset);
         }

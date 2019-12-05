@@ -35,7 +35,7 @@ void simple_linked_list_test(int list_size, int num_lists){
 	for (int i = 0; i < num_lists; i++) {
 		struct linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
-			list = linked_list_append_before(66, list);
+			list = linked_list_append_before(100+j, list);
 			uint64_t* i_output = (uint64_t*) list;
 			printf("%lu", *i_output);
 		}
