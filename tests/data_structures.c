@@ -101,6 +101,20 @@ void simple_cyclic_list(int list_size){ //does a simple chain of nodes but links
 	list->next = head; //link the last node back to the first
 }
 
+int simple_linked_tree_helper(int depth, int n, struct linked_list *root) {
+    if (depth == 0) return n;
+    struct linked_list *left = linked_list_append_before(n++, root);
+    struct linked_list *right = linked_list_append_before(n++, root);
+    n = simple_linked_tree_helper(depth-1, n, left);
+    n = simple_linked_tree_helper(depth-1, n, right);
+    return n;
+}
+
+void simple_linked_tree(int depth) { // makes a binary tree with a given depth (every node points to its parent)
+    struct linked_list *root = linked_list_append_before(1, NULL);
+    simple_linked_tree_helper(depth, 2, root);
+}
+
 int main() {
 	//Seed the random number generator so that it doesn't do the same sequence every time
 	srand(time(NULL)); 
@@ -108,7 +122,8 @@ int main() {
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
-	simple_linked_list_test(10,1);
+	//simple_linked_list_test(10,1);
+    simple_linked_tree(4);
 	//simple_cyclic_list(10);
 	sleep(10000);
 }
