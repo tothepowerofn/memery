@@ -9,13 +9,9 @@ TESTS=tests/data_structures.o tests/exploit.o
 all: cd2mem map_pointers tests
 
 clean:
-	rm -f cd2mem/demo_cd2mem.o
-	rm -f cd2mem/cd2mem.o
-	rm -f cd2mem/map_pointers.o
-	rm -f tests/data_structures.o
-	rm -f bin/demo_cd2mem
-	rm -f bin/map_pointers
-	rm -f bin/tests
+	rm -f $(CD2MEM)
+	rm -f $(TESTS)
+	rm -f bin/* 
 
 %.o: %.cpp
 	$(COMPILER) $(CFLAGS) -c -o $@ $<

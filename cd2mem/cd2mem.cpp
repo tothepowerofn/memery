@@ -74,7 +74,8 @@ void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
     /* copy values from dump */
     for (uint64_t i = 0; i < num_p; i++) {
 		// call read_8bytes to get the next 8 bytes of the heap starting at i
-		uintptr_t val = read_vuln(i);
+		uintptr_t val = read_vuln(i*8 + starting_addr);
+        //p_arr[i].raw_value = val;
     	//uintptr_t val = get_val(8byte*8);
 		uintptr_t addr = to_addr(val);
 		// initalize values in struct

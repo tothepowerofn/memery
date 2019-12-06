@@ -22,12 +22,13 @@ void usage() {
 }
 
 int main(int argc, char *argv[]) {
-    setup_exploit();
+    if (setup_exploit()) return 1;
 	starting_addr = exploit_startaddr();
 	ending_addr = exploit_endaddr();
 
     /* number of and array of qwords in heap memory */
-	long num_p = (((HEAP_SIZE*2) / 8) + 1);
+    cout << ending_addr << " " << starting_addr << " " << HEAP_SIZE << endl;
+	long num_p = ((HEAP_SIZE*2) / 8);
     assert(num_p == (ending_addr - starting_addr) / 8);
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
 
