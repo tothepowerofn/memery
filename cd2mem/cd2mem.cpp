@@ -84,10 +84,10 @@ void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
 		p_arr[i].seeloop = 0;
 		// check if current index is pointer or not
 		if (p_arr[i].addr > ending_addr - starting_addr) {
-			p_arr[i].type = 0;
+			p_arr[i].type = T_INT;
 		}
         else {
-			p_arr[i].type = 1;
+			p_arr[i].type = T_HEAP;
 			//cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
 			//cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}
