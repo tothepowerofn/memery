@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <iostream>
+#include "funcptr.h"
 
 #define PTR_SIZE 8
 
@@ -48,28 +49,6 @@ uintptr_t to_addr(uintptr_t addr) {
 	return potential_addr / 8;
 }
 	
-// will grab the next 8 bytes of mem block
-uintptr_t get_val(uintptr_t rel_start){
-	FILE *fptr = fopen("cd2mem.log", "a");
-	char res[19];
-	memset(res, 0, 19);
-	sprintf(res + strlen(res), "%s", "0x");
-	
-	for(int i = 7; i>=0; i--){ 	
-		char temp[3];
-		memset(temp, 0, 3);
-		sprintf(temp + strlen(temp), "%hhx", *(memblock+rel_start+i));
-		if(strlen(temp) == 1){
-			sprintf(res + strlen(res), "%s", "0");
-		}
-		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
-	}
-	fprintf(fptr, "Value: %s\n", res);
-	fclose(fptr);
-	uintptr_t lu_res = strtoul(res, NULL, 16);
-	return lu_res;
-}
-
 void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
     /* copy values from dump */
     for (uint64_t i = 0; i < num_p; i++) {
@@ -82,6 +61,9 @@ void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
     	p_arr[i].addr = addr;
 		p_arr[i].ds = NULL;
 		p_arr[i].seeloop = 0;
+		if (val == 0xFFFFFFFFFFFF) {
+			p_arr[i].type = T_INVALID;
+		}
 		// check if current index is pointer or not
 		if (p_arr[i].addr > ending_addr - starting_addr) {
 			p_arr[i].type = T_INT;

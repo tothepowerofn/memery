@@ -16,6 +16,8 @@ struct linked_list *linked_list_append_before(unsigned int value, struct linked_
 	printf("pointer to next node: %p\n", new_head);
 	new_head->value = value;
 	new_head->next = head;
+	new_head->fptr = &random_int;
+	new_head->str = "WHOOOOOO";
 	return new_head;
 }
 
@@ -128,8 +130,8 @@ int main() {
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
-	//simple_linked_list_test(10,1);
-    simple_linked_tree(4);
+	simple_linked_list_test(10,1);
+    //simple_linked_tree(4);
 	//simple_cyclic_list(10);
     exploit_loop();
 }

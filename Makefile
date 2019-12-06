@@ -1,7 +1,7 @@
 COMPILER=g++
 CFLAGS=-g -I cd2mem -I tests -std=gnu++11
 
-CD2MEM=cd2mem/map_pointers.o cd2mem/cd2mem.o cd2mem/singly_linked.o cd2mem/exploit.o
+CD2MEM=cd2mem/map_pointers.o cd2mem/cd2mem.o cd2mem/singly_linked.o cd2mem/exploit.o cd2mem/funcptr.o
 TESTS=tests/data_structures.o tests/exploit.o
 
 .PHONY: all clean cd2mem map_pointers tests

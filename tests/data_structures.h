@@ -6,6 +6,8 @@
 
 struct linked_list {
     uint64_t value;
+    uintptr_t fptr;
+	char* str;
     struct linked_list *next;
 };
 

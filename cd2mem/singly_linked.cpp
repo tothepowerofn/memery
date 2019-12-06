@@ -87,6 +87,27 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
     }
 }
 
+int determine_type(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
+	// copy bytes pointed to by current address
+	uintptr_t copied_data [3];
+	for (int j = 0; j < 3; j++) {
+		copied_data[j] = read_vuln(elt + 8*j);
+	}
+	// check for function pointer
+	int func_ptr = is_func_ptr((char*) copied_data, 24);
+	if (func_ptr == 1) {
+		p_arr[index].type = T_FUNC;
+		return p_arr[index].type;
+	}
+	// check for string
+	char* acceptable_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int is_str = classify_as_ascii((char*) copied_data, acceptable_chars, 3);
+	if (is_str == 1) {
+		p_arr[index].type = T_STR;
+		return p_arr[index].type;
+	}
+}
+
 void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "  (" << index << ") -> (";
@@ -95,7 +116,8 @@ void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct
     cout << "): ||";
 	for (int i = 0; i < ds->ptr_offset; i++) {
 		uintptr_t elt = p_arr[index+i].raw_value;
-		cout << " " << elt << " (int) || ";
+		int type = determine_type(p_arr, index, elt);
+		cout << " " << elt << " ( " << type << " ) || ";
     }
     cout << endl;
 }

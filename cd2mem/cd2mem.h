@@ -11,11 +11,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include "exploit.h"
+#include "funcptr.h"
 
 #define T_INT       0
 #define T_HEAP      1
 #define T_STR       2
 #define T_FUNC      3
+#define T_INVALID   4
 
 struct mem_ptr {
 	int seeloop;

@@ -17,4 +17,4 @@
 std::string exec_command(const char* cmd);
 bool mem2file (std::string const & filename, char const * data, size_t const bytes);
 char* hex2mem(char* string);
-bool is_func_ptr(char * mem, size_t sz);
+int is_func_ptr(char * mem, size_t sz);
