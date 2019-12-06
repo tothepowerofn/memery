@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
 	long num_p = ((HEAP_SIZE*2) / 8);
     assert(num_p == (ending_addr - starting_addr) / 8);
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
-
+    read_vuln(0);
+    
     init_pointers(p_arr, num_p);
 
     list<struct mem_struct*>* ds_list = find_singly_linked_ds(p_arr, num_p);

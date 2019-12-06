@@ -94,8 +94,8 @@ void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct
     else cout << "---";
     cout << "): ||";
 	for (int i = 0; i < ds->ptr_offset; i++) {
-//		uintptr_t elt = p_arr[index+i].raw_value;
-//		cout << " " << elt << " (int) || ";
+		uintptr_t elt = p_arr[index+i].raw_value;
+		cout << " " << elt << " (int) || ";
     }
     cout << endl;
 }

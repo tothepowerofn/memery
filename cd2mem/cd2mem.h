@@ -18,7 +18,7 @@
 struct mem_ptr {
 	int seeloop;
 	int isroot;
-//    uint64_t raw_value;
+    uint64_t raw_value;
 	uintptr_t addr;
 	unsigned int type;
     struct mem_struct *ds;
