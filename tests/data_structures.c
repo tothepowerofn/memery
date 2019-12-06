@@ -37,7 +37,7 @@ struct doubly_linked_list *doubly_linked_list_append(unsigned int value, struct 
 void traverse_doubly_linked(struct doubly_linked_list *head){
 	struct doubly_linked_list *iterator = head;
 	while(iterator){
-		printf("h	%p	prev: %p, next: %p, value: %d \n\n", head, head->prev, head->next, head->value);
+		printf("h	%p	prev: %p, next: %p, value: %d \n\n", iterator, iterator->prev, iterator->next, iterator->value);
 		iterator = iterator->next;
 	}
 }
@@ -152,8 +152,10 @@ int main() {
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
-	simple_linked_list_test(10,1);
+	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
 	//simple_cyclic_list(10);
-    exploit_loop();
+	traverse_doubly_linked(simple_doubly_linked_test(10,1));
+	exploit_loop();
+	//sleep(10000);
 }
