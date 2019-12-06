@@ -17,18 +17,40 @@ struct linked_list *linked_list_append_before(unsigned int value, struct linked_
 	return new_head;
 }
 
-struct doubly_linked_list *doubly_linked_list_append_before(unsigned int value, struct doubly_linked_list *head) {
+struct doubly_linked_list *doubly_linked_list_append(unsigned int value, struct doubly_linked_list *head) {
 	struct doubly_linked_list *new_head = (struct doubly_linked_list*) malloc(sizeof(struct doubly_linked_list));
+	new_head->next = NULL;
 	new_head->value = value;
-	new_head->next = head;
 	if (head) {
-		if (head->prev) {
-			head->prev->next = new_head;
-			new_head->prev = head->prev;
-		}
-		head->prev = new_head;
+		head->next = new_head;
+		new_head->prev = head;
+		printf("h	%p	prev: %p, next: %p, value: %d \n", head, head->prev, head->next, head->value);
 	}
+	printf("nh	%p	prev: %p, next: %p, value: %d \n\n", new_head, new_head->prev, new_head->next, new_head->value);
 	return new_head;
+}
+
+void traverse_doubly_linked(struct doubly_linked_list *head){
+	struct doubly_linked_list *iterator = head;
+	while(iterator){
+		printf("h	%p	prev: %p, next: %p, value: %d \n\n", head, head->prev, head->next, head->value);
+		iterator = iterator->next;
+	}
+}
+
+struct doubly_linked_list* simple_doubly_linked_test(int list_size, int num_lists){
+	struct doubly_linked_list* head = NULL;
+	for (int i = 0; i < num_lists; i++) {
+		struct doubly_linked_list *list = NULL;
+		for (int j = 0; j < list_size; j++) {
+			list = doubly_linked_list_append(100+j, list);
+			uint64_t* i_output = (uint64_t*) list;
+			if(!head){
+				head = list;
+			}
+		}
+	}
+	return head;
 }
 
 void simple_linked_list_test(int list_size, int num_lists){
@@ -121,13 +143,14 @@ void simple_linked_tree(int depth) { // makes a binary tree with a given depth (
 
 int main() {
 	//Seed the random number generator so that it doesn't do the same sequence every time
-	srand(time(NULL)); 
+	//srand(time(NULL)); 
 	//Make a linked list with variably spaced nodes
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
 	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
-	simple_cyclic_list(10);
+	//simple_cyclic_list(10);
+	traverse_doubly_linked(simple_doubly_linked_test(10,1));
 	sleep(10000);
 }
