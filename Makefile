@@ -1,5 +1,5 @@
 COMPILER=g++
-CFLAGS=-g -I cd2mem -I tests -std=c++11 
+CFLAGS=-g -I cd2mem -I tests -std=gnu++11
 
 CD2MEM=cd2mem/map_pointers.o cd2mem/cd2mem.o cd2mem/singly_linked.o cd2mem/exploit.o
 TESTS=tests/data_structures.o tests/exploit.o
@@ -22,3 +22,5 @@ map_pointers: $(CD2MEM)
 tests: tests/data_structures.o tests/exploit.o
 	$(COMPILER) $(CFLAGS) $(TESTS) -o bin/tests
 
+funcptr: cd2mem/funcptr.cpp cd2mem/funcptr.h cd2mem/funcptr_test.cpp 
+	$(COMPILER) $(CFLAGS) $(FUNCPTR) -o bin/funcptr_test
