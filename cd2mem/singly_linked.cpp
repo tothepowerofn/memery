@@ -4,7 +4,7 @@
 #define MIN_DEPTH 2
 
 void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
-	while (p_arr[index].type == 1 && p_arr[index].seeloop) {
+	while (p_arr[index].type == T_HEAP && p_arr[index].seeloop) {
 		p_arr[index].seeloop = 0;
 		index = p_arr[index].addr + offset;
 	}
@@ -18,7 +18,7 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
     *pre_ds = NULL;
 
 	// Count how many pointers we can chase (i.e. nodes in the data structure)
-	while (p_arr[index].type == 1) { 
+	while (p_arr[index].type == T_HEAP) { 
 		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
 		if (p_arr[index].seeloop == 1) {
 			break;
@@ -40,7 +40,7 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
 
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
 	uintptr_t reset_index = index;
-	while (p_arr[index].type == 1) { 
+	while (p_arr[index].type == T_HEAP) { 
 		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
 			break;
 		}
@@ -72,12 +72,12 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
     list<uintptr_t>* nodes = new list<uintptr_t>;
     ds->nodes = nodes;
 	for (auto j: *(ds->roots)) {
-        while (p_arr[j].type == 1 && !p_arr[j].seeloop) {
+        while (p_arr[j].type == T_HEAP && !p_arr[j].seeloop) {
             ds->nodes->push_back(j-ds->ptr_offset);
             p_arr[j].seeloop = 1;
             j = p_arr[j].addr + ds->ptr_offset;
         }
-        if (p_arr[j].type == 0 && !p_arr[j].seeloop) {
+        if (p_arr[j].type == T_INT && !p_arr[j].seeloop) {
             p_arr[j].seeloop = 1;
             ds->nodes->push_back(j-ds->ptr_offset);
         }
@@ -87,21 +87,43 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
     }
 }
 
+int determine_type(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
+	// copy bytes pointed to by current address
+	uintptr_t copied_data [3];
+	for (int j = 0; j < 3; j++) {
+		copied_data[j] = read_vuln(elt + 8*j);
+	}
+	// check for function pointer
+	int func_ptr = is_func_ptr((char*) copied_data, 24);
+	if (func_ptr == 1) {
+		p_arr[index].type = T_FUNC;
+		return p_arr[index].type;
+	}
+	// check for string
+	char* acceptable_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int is_str = classify_as_ascii((char*) copied_data, acceptable_chars, 3);
+	if (is_str == 1) {
+		p_arr[index].type = T_STR;
+		return p_arr[index].type;
+	}
+}
+
 void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "  (" << index << ") -> (";
-    if (p_arr[index+ds->ptr_offset].type == 1) cout << p_arr[index+ds->ptr_offset].addr;
+    if (p_arr[index+ds->ptr_offset].type == T_HEAP) cout << p_arr[index+ds->ptr_offset].addr;
     else cout << "---";
     cout << "): ||";
 	for (int i = 0; i < ds->ptr_offset; i++) {
-		uintptr_t elt = get_val((index+i)*8);	
-		cout << " " << elt << " (int) || ";
+		uintptr_t elt = p_arr[index+i].raw_value;
+		int type = determine_type(p_arr, index, elt);
+		cout << " " << elt << " ( " << type << " ) || ";
     }
     cout << endl;
 }
 
 void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
-    cout << "Struct [size " << ds->size << "]" << endl;
+    cout << "Struct [offset " << ds->ptr_offset << ", size " << ds->size << "]" << endl;
     for (auto j: *(ds->nodes)) {
         pretty_print_struct_entry(p_arr, j, ds);
     }
@@ -110,8 +132,8 @@ void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
 
 int correct_size(struct mem_ptr* p_arr, uintptr_t index){
 	uintptr_t reset_index = index;
-	while (p_arr[index].type == 1) {
-		// if circular then last node will be marked as type 1, so correction is 0
+	while (p_arr[index].type == T_HEAP) {
+		// if circular then last node will be marked as T_HEAP, so correction is 0
 		if (p_arr[index].seeloop == 1) {
 			reset_seeloop(p_arr, reset_index, p_arr[index].ds->ptr_offset);
 			return 0;
@@ -130,7 +152,7 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
     /* Go through all candidate pointers in p_arr */
     for(uintptr_t i = 0; i < num_p; i++) {
         if (p_arr[i].ds) continue;
-        if (p_arr[i].type == 0) continue; //If it's not a pointer
+        if (p_arr[i].type == T_INT) continue; //If it's not a pointer
         for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
 			/* finds depth of chain with given offset */
             struct mem_struct *ds;

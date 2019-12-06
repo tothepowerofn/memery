@@ -1,7 +1,9 @@
 #include "cd2mem.h"
+#include "exploit.h"
 #include <memory.h>
 #include <stdlib.h>
 #include <iostream>
+#include "funcptr.h"
 
 #define PTR_SIZE 8
 
@@ -47,43 +49,27 @@ uintptr_t to_addr(uintptr_t addr) {
 	return potential_addr / 8;
 }
 	
-// will grab the next 8 bytes of mem block
-uintptr_t get_val(uintptr_t rel_start){
-	FILE *fptr = fopen("cd2mem.log", "a");
-	char res[19];
-	memset(res, 0, 19);
-	sprintf(res + strlen(res), "%s", "0x");
-	
-	for(int i = 7; i>=0; i--){ 	
-		char temp[3];
-		memset(temp, 0, 3);
-		sprintf(temp + strlen(temp), "%hhx", *(memblock+rel_start+i));
-		if(strlen(temp) == 1){
-			sprintf(res + strlen(res), "%s", "0");
-		}
-		sprintf(res + strlen(res), "%hhx", *(memblock+rel_start+i));
-	}
-	fprintf(fptr, "Value: %s\n", res);
-	fclose(fptr);
-	uintptr_t lu_res = strtoul(res, NULL, 16);
-	return lu_res;
-}
-
 void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
     /* copy values from dump */
     for (uint64_t i = 0; i < num_p; i++) {
-    	uintptr_t val = get_val(i*8);
+		// call read_8bytes to get the next 8 bytes of the heap starting at i
+		uintptr_t val = read_vuln(i*8 + starting_addr);
+        p_arr[i].raw_value = val;
+    	//uintptr_t val = get_val(8byte*8);
 		uintptr_t addr = to_addr(val);
 		// initalize values in struct
     	p_arr[i].addr = addr;
 		p_arr[i].ds = NULL;
 		p_arr[i].seeloop = 0;
+		if (val == 0xFFFFFFFFFFFF) {
+			p_arr[i].type = T_INVALID;
+		}
 		// check if current index is pointer or not
 		if (p_arr[i].addr > ending_addr - starting_addr) {
-			p_arr[i].type = 0;
+			p_arr[i].type = T_INT;
 		}
         else {
-			p_arr[i].type = 1;
+			p_arr[i].type = T_HEAP;
 			//cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
 			//cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}

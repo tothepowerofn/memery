@@ -1,10 +1,14 @@
 #ifndef __DATA_STRUCTURES_H
 #define __DATA_STRUCTURES_H
+
+#include <stdint.h>
 #include <unistd.h>
 
 struct linked_list {
-	unsigned int value;
-	struct linked_list *next;
+    uint64_t value;
+    uintptr_t fptr;
+	char* str;
+    struct linked_list *next;
 };
 
 struct doubly_linked_list {

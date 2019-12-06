@@ -11,13 +11,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include "exploit.h"
+#include "funcptr.h"
 
-// struct stores pointer and type
-// type 0 = nonpointer 
-// type 1 = pointer (of some sort)
+#define T_INT       0
+#define T_HEAP      1
+#define T_STR       2
+#define T_FUNC      3
+#define T_INVALID   4
+
 struct mem_ptr {
 	int seeloop;
 	int isroot;
+    uint64_t raw_value;
 	uintptr_t addr;
 	unsigned int type;
     struct mem_struct *ds;
