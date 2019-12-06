@@ -27,7 +27,6 @@ int main(int argc, char *argv[]) {
 	ending_addr = exploit_endaddr();
 
     /* number of and array of qwords in heap memory */
-    cout << ending_addr << " " << starting_addr << " " << HEAP_SIZE << endl;
 	long num_p = ((HEAP_SIZE*2) / 8);
     assert(num_p == (ending_addr - starting_addr) / 8);
 	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
@@ -40,7 +39,6 @@ int main(int argc, char *argv[]) {
 	// print out entire ds(s) starting from root(s)
 	for (auto i: *(ds_list)) {
         finalize_nodes(p_arr, i);
-        cout << i->nodes->size() << endl;
         pretty_print_struct(p_arr, i);
 	}
 

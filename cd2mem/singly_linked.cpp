@@ -12,13 +12,18 @@ void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) 
 
 int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds) {
 	int depth = 0;
-	uintptr_t reset_index = index;
+	uintptr_t original_index = index;
 
     // *ds stores second return value --- pre-existing data structure
     *pre_ds = NULL;
 
 	// Count how many pointers we can chase (i.e. nodes in the data structure)
-	while (p_arr[index].type == T_HEAP) { 
+	while (p_arr[index].type == T_HEAP) {
+        // we were guessing the wrong offset in a doubly linked data structure (heuristic)
+        if (index >= original_index - offset && index < original_index) {
+            depth = 0;
+            break;
+        }
 		// we have encountered a previously seen node on current iteration (indicating some sort of loop in the data structure)
 		if (p_arr[index].seeloop == 1) {
 			break;
@@ -31,16 +36,16 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
         depth++;
     }
 	// fixing the last node situation
-    if (p_arr[index].ds) {
+    if (p_arr[index].ds && depth) {
         *pre_ds = p_arr[index].ds;
     }
-	reset_seeloop(p_arr, reset_index, offset);
+	reset_seeloop(p_arr, original_index, offset);
 	return depth;
 }
 
 void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
-	uintptr_t reset_index = index;
-	while (p_arr[index].type == T_HEAP) { 
+	uintptr_t original_index = index;
+	while (p_arr[index].type == T_HEAP) {
 		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
 			break;
 		}
@@ -49,7 +54,7 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
         index = p_arr[index].addr + offset;
     }
     p_arr[index].ds = ds;
-	reset_seeloop(p_arr, reset_index, offset);
+	reset_seeloop(p_arr, original_index, offset);
 }	
 
 void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
@@ -150,18 +155,27 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
 
     unsigned int id = 0;
     /* Go through all candidate pointers in p_arr */
-    for(uintptr_t i = 0; i < num_p; i++) {
-        if (p_arr[i].ds) continue;
-        if (p_arr[i].type == T_INT) continue; //If it's not a pointer
-        for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
+    for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
+        for(uintptr_t i = 0; i < num_p; i++) {
+            if (p_arr[i].ds) continue;
+            if (p_arr[i].type == T_INT) continue; //If it's not a pointer
 			/* finds depth of chain with given offset */
             struct mem_struct *ds;
 			int depth = find_chain_len(p_arr, i, offset, &ds);
-			//cout << "CURRENT DEPTH: " << depth << " CURRENT OFFSET: " << offset << endl;
-			//cout << "ds: " << ds << " p_arr[i].ds: " << p_arr[i].ds << endl;
 			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
 				continue;
 			}
+
+            // check if we already found a datastructure that is a different part of this purported datastructure
+            bool doubly_linked = false;
+            for (int j = 0; j < offset; j++) {
+                if (ds && ds == p_arr[i-offset+j].ds) {
+                    doubly_linked = true;
+                    break;
+                }
+            }
+            if (doubly_linked) continue;
+
 			// if the linked list belongs to previously found linked list
 			if (ds != NULL) {
 				assign_chain_ds(p_arr, i, offset, ds);
@@ -187,10 +201,7 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
                 ds->ptr_offset = offset;
 				int correction = correct_size(p_arr, i);
                 ds->size = depth+correction;
-//                cout << "Created new DS" << endl;
 			}
-//            cout << "Found DS with size " << ds->size << " at index " << i << " and offset " << offset << endl;
-			
         }
     }
 
