@@ -101,7 +101,7 @@ void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct
 }
 
 void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
-    cout << "Struct [size " << ds->size << "]" << endl;
+    cout << "Struct [offset " << ds->ptr_offset << ", size " << ds->size << "]" << endl;
     for (auto j: *(ds->nodes)) {
         pretty_print_struct_entry(p_arr, j, ds);
     }
