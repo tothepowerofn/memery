@@ -97,7 +97,7 @@ int determine_type_onenode(struct mem_ptr* p_arr, unsigned int index, uintptr_t 
 void finalize_types(struct mem_ptr* p_arr, struct mem_struct *ds, int* types_per_struct ) {
 	// assign this set of types to all nodes in ds
 	for (int i = 0; i < ds->ptr_offset; i++) {
-		cout << types_per_struct[i] << endl;
+		// cout << types_per_struct[i] << endl;
 	}
 	// loop through all the nodes in the ds
 	for (auto n: *(ds->nodes)) {
