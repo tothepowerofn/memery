@@ -49,7 +49,7 @@ uintptr_t to_addr(uintptr_t addr) {
 	return potential_addr / 8;
 }
 	
-void init_pointers(struct mem_ptr *p_arr, unsigned int num_p) {
+void init_pointers(struct heap_entry *p_arr, unsigned int num_p) {
     /* copy values from dump */
     for (uint64_t i = 0; i < num_p; i++) {
 		// call read_8bytes to get the next 8 bytes of the heap starting at i

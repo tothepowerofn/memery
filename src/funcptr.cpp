@@ -76,5 +76,5 @@ bool mem2file (std::string const & filename, char const * data, size_t const byt
 //see if the first instructions follow conventions, and then outputting that result
 int is_func_ptr(char* mem, size_t sz){
     mem2file("testfunc", mem, sz); //NOTE: we always save the memory as file named testfunc in the bin folder
-    return stoi(exec_command("python3 ../cd2mem/funcptrclassify.py"));
+    return stoi(exec_command("python3 ../src/funcptrclassify.py"));
 }

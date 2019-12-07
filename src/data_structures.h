@@ -5,15 +5,23 @@
 #include <iostream>
 #include <list>
 #include <iterator>
+
+#define MAX_OFFSET 5
+
 using namespace std;
 
-struct mem_struct {
+struct single_struct {
     unsigned int id;
     uintptr_t ptr_offset;
     unsigned int size;
-	std::list<uintptr_t>* roots;
-    std::list<uintptr_t>* nodes;
-	std::list<int>* testy;
+	list<uintptr_t>* roots;
+    list<uintptr_t>* nodes;
+    struct multi_struct *ms;
+};
+
+struct multi_struct {
+    unsigned int id;
+    list<struct single_struct*>* single_structs;
 };
 
 #endif

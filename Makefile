@@ -1,7 +1,7 @@
 COMPILER=g++
 CFLAGS=-g -I cd2mem -I tests -std=gnu++11
 
-MEMERY=src/memery.o src/cd2mem.o src/singly_linked.o src/exploit.o src/funcptr.o
+MEMERY=src/memery.o src/cd2mem.o src/singly_linked.o src/exploit.o src/funcptr.o src/multi_linked.o
 TESTS=tests/binary_tree tests/circular_doubly_linked_list tests/circular_singly_linked_list tests/linked_tree tests/non_consecutive_doubly_linked_list tests/non_consecutive_singly_linked_list tests/scattered_doubly_linked_list tests/scattered_singly_linked_list tests/simple_doubly_linked_list tests/simple_singly_linked_list
 FUNCPTR=src/funcptr.cpp src/funcptr.h src/funcptr_test.cpp 
 

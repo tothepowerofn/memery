@@ -4,6 +4,7 @@
 #include "cd2mem.h"
 #include "exploit.h"
 #include "singly_linked.h"
+#include "multi_linked.h"
 #include "exploit.h"
 
 using namespace std;
@@ -29,18 +30,24 @@ int main(int argc, char *argv[]) {
     /* number of and array of qwords in heap memory */
 	long num_p = ((HEAP_SIZE*2) / 8);
     assert(num_p == (ending_addr - starting_addr) / 8);
-	struct mem_ptr* p_arr = (struct mem_ptr*) malloc(num_p * sizeof(struct mem_ptr));
+	struct heap_entry* p_arr = (struct heap_entry*) malloc(num_p * sizeof(struct heap_entry));
     read_vuln(0);
     
     init_pointers(p_arr, num_p);
 
-    list<struct mem_struct*>* ds_list = find_singly_linked_ds(p_arr, num_p);
+    list<struct single_struct*>* ds_list = find_singly_linked_ds(p_arr, num_p);
 
 	// print out entire ds(s) starting from root(s)
 	for (auto i: *(ds_list)) {
         finalize_nodes(p_arr, i);
         pretty_print_struct(p_arr, i);
 	}
+
+    list<struct multi_struct*>* ms_list = find_multi_linked_ds(p_arr, ds_list);
+
+    for (auto i : *(ms_list)) {
+        pretty_print_multistruct(i);
+    }
 
     // TODO: Doubly-linked lists
 	// TODO: Detect function pointers?!

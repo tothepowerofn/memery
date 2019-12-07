@@ -1,16 +1,15 @@
 #include "cd2mem.h"
 
-#define MAX_OFFSET 5
 #define MIN_DEPTH 2
 
-void reset_seeloop(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset) {
+void reset_seeloop(struct heap_entry* p_arr, uintptr_t index, unsigned int offset) {
 	while (p_arr[index].type == T_HEAP && p_arr[index].seeloop) {
 		p_arr[index].seeloop = 0;
 		index = p_arr[index].addr + offset;
 	}
 }
 
-int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct **pre_ds) {
+int find_chain_len(struct heap_entry* p_arr, uintptr_t index, unsigned int offset, struct single_struct **pre_ds) {
 	int depth = 0;
 	uintptr_t original_index = index;
 
@@ -43,7 +42,7 @@ int find_chain_len(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, 
 	return depth;
 }
 
-void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset, struct mem_struct* ds) {
+void assign_chain_ds(struct heap_entry* p_arr, uintptr_t index, unsigned int offset, struct single_struct* ds) {
 	uintptr_t original_index = index;
 	while (p_arr[index].type == T_HEAP) {
 		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
@@ -57,14 +56,14 @@ void assign_chain_ds(struct mem_ptr* p_arr, uintptr_t index, unsigned int offset
 	reset_seeloop(p_arr, original_index, offset);
 }	
 
-void assign_root(struct mem_ptr* p_arr, uintptr_t index) {
+void assign_root(struct heap_entry* p_arr, uintptr_t index) {
 	// update per struct property
 	p_arr[index].isroot = 1;
 	// update per ds property
 	p_arr[index].ds->roots->push_back(index);
 }
 
-void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
+void upgrade_root(struct heap_entry* p_arr, uintptr_t index, uintptr_t pointing_to_node) {
 	// update per struct property
 	p_arr[pointing_to_node].isroot = 0;
 	p_arr[index].isroot = 1;
@@ -73,7 +72,7 @@ void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_
 	p_arr[index].ds->roots->push_back(index);
 }
 
-int determine_type_onenode(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
+int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr_t elt) {
 	// copy bytes pointed to by current address
 	uintptr_t copied_data [3];
 	for (int j = 0; j < 3; j++) {
@@ -94,7 +93,7 @@ int determine_type_onenode(struct mem_ptr* p_arr, unsigned int index, uintptr_t 
 	}
 }
 
-void finalize_types(struct mem_ptr* p_arr, struct mem_struct *ds, int* types_per_struct ) {
+void finalize_types(struct heap_entry* p_arr, struct single_struct *ds, int* types_per_struct ) {
 	// assign this set of types to all nodes in ds
 	for (int i = 0; i < ds->ptr_offset; i++) {
 		// cout << types_per_struct[i] << endl;
@@ -108,7 +107,7 @@ void finalize_types(struct mem_ptr* p_arr, struct mem_struct *ds, int* types_per
 	}
 }
 
-void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
+void finalize_nodes(struct heap_entry* p_arr, struct single_struct *ds) {
     list<uintptr_t>* nodes = new list<uintptr_t>;
     ds->nodes = nodes;
 	for (auto j: *(ds->roots)) {
@@ -135,7 +134,7 @@ void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
 	finalize_types(p_arr, ds, types_per_struct);
 }
 
-void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
+void pretty_print_struct_entry(struct heap_entry *p_arr, unsigned int index, struct single_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "  (" << index << ") -> (";
     if (p_arr[index+ds->ptr_offset].type == T_HEAP) cout << p_arr[index+ds->ptr_offset].addr;
@@ -169,15 +168,15 @@ void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct
     cout << endl;
 }
 
-void pretty_print_struct(struct mem_ptr *p_arr, struct mem_struct *ds) {
-    cout << "Struct [offset " << ds->ptr_offset << ", size " << ds->size << "]" << endl;
+void pretty_print_struct(struct heap_entry *p_arr, struct single_struct *ds) {
+    cout << "Struct #" << ds->id << " [offset " << ds->ptr_offset << ", size " << ds->size << "]" << endl;
     for (auto j: *(ds->nodes)) {
         pretty_print_struct_entry(p_arr, j, ds);
     }
     cout << endl;
 }
 
-int correct_size(struct mem_ptr* p_arr, uintptr_t index){
+int correct_size(struct heap_entry* p_arr, uintptr_t index){
 	uintptr_t reset_index = index;
 	while (p_arr[index].type == T_HEAP) {
 		// if circular then last node will be marked as T_HEAP, so correction is 0
@@ -192,8 +191,8 @@ int correct_size(struct mem_ptr* p_arr, uintptr_t index){
 	return 1;
 }
 
-std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsigned int num_p) {
-    std::list<struct mem_struct*>* ds_list = new std::list<struct mem_struct*>;
+std::list<struct single_struct*>* find_singly_linked_ds(struct heap_entry* p_arr, unsigned int num_p) {
+    std::list<struct single_struct*>* ds_list = new std::list<struct single_struct*>;
 
     unsigned int id = 0;
     /* Go through all candidate pointers in p_arr */
@@ -202,7 +201,7 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
             if (p_arr[i].ds) continue;
             if (p_arr[i].type == T_INT) continue; //If it's not a pointer
 			/* finds depth of chain with given offset */
-            struct mem_struct *ds;
+            struct single_struct *ds;
 			int depth = find_chain_len(p_arr, i, offset, &ds);
 			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
 				continue;
@@ -212,7 +211,7 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
             // or if we found a datastructure within this purported datastructure with the same offset
             bool doubly_linked = false;
             for (int j = 0; j < offset; j++) {
-                struct mem_struct *prev_ds = p_arr[i-offset+j].ds;
+                struct single_struct *prev_ds = p_arr[i-offset+j].ds;
                 if (prev_ds && (prev_ds == ds || prev_ds->ptr_offset == offset)) {
                     doubly_linked = true;
                     break;
@@ -235,7 +234,7 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
 			}
 			// belongs to a new data structure
 			else {
-                ds = (struct mem_struct*) malloc(sizeof(struct mem_struct));
+                ds = (struct single_struct*) malloc(sizeof(struct single_struct));
 				ds_list->push_back(ds);
 				assign_chain_ds(p_arr, i, offset, ds);
     			list<uintptr_t>* roots = new list<uintptr_t>;

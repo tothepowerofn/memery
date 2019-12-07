@@ -20,13 +20,14 @@
 #define T_FUNC      3
 #define T_INVALID   4
 
-struct mem_ptr {
+struct heap_entry {
 	int seeloop;
 	int isroot;
     uint64_t raw_value;
 	uintptr_t addr;
 	unsigned int type;
-    struct mem_struct *ds;
+
+    struct single_struct *ds; // non-null if this address is the pointer in a singly-linked datastructure
 };
 
 uintptr_t ascii_hex_to_ptr(char* hexstring);
@@ -43,7 +44,7 @@ void set_heap_end(uintptr_t addr);
 uintptr_t get_val(uintptr_t rel_start);
 uintptr_t to_addr(uintptr_t addr);
 
-void init_pointers(struct mem_ptr *p_arr, unsigned int num_p);
+void init_pointers(struct heap_entry *p_arr, unsigned int num_p);
 
 int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii);
 
