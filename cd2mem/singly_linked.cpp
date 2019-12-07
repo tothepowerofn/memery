@@ -73,26 +73,7 @@ void upgrade_root(struct mem_ptr* p_arr, uintptr_t index, uintptr_t pointing_to_
 	p_arr[index].ds->roots->push_back(index);
 }
 
-void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
-    list<uintptr_t>* nodes = new list<uintptr_t>;
-    ds->nodes = nodes;
-	for (auto j: *(ds->roots)) {
-        while (p_arr[j].type == T_HEAP && !p_arr[j].seeloop) {
-            ds->nodes->push_back(j-ds->ptr_offset);
-            p_arr[j].seeloop = 1;
-            j = p_arr[j].addr + ds->ptr_offset;
-        }
-        if (p_arr[j].type == T_INT && !p_arr[j].seeloop) {
-            p_arr[j].seeloop = 1;
-            ds->nodes->push_back(j-ds->ptr_offset);
-        }
-	}
-    for (auto j: *(ds->roots)) {
-        reset_seeloop(p_arr, j, ds->ptr_offset);
-    }
-}
-
-int determine_type(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
+int determine_type_onenode(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
 	// copy bytes pointed to by current address
 	uintptr_t copied_data [3];
 	for (int j = 0; j < 3; j++) {
@@ -113,6 +94,47 @@ int determine_type(struct mem_ptr* p_arr, unsigned int index, uintptr_t elt) {
 	}
 }
 
+void finalize_types(struct mem_ptr* p_arr, struct mem_struct *ds, int* types_per_struct ) {
+	// assign this set of types to all nodes in ds
+	for (int i = 0; i < ds->ptr_offset; i++) {
+		cout << types_per_struct[i] << endl;
+	}
+	// loop through all the nodes in the ds
+	for (auto n: *(ds->nodes)) {
+		// traverse down each element in node
+		for (int i = 0; i < ds->ptr_offset; i++) {
+			p_arr[n+i].type = types_per_struct[i];
+		}
+	}
+}
+
+void finalize_nodes(struct mem_ptr* p_arr, struct mem_struct *ds) {
+    list<uintptr_t>* nodes = new list<uintptr_t>;
+    ds->nodes = nodes;
+	for (auto j: *(ds->roots)) {
+        while (p_arr[j].type == T_HEAP && !p_arr[j].seeloop) {
+            ds->nodes->push_back(j-ds->ptr_offset);
+            p_arr[j].seeloop = 1;
+            j = p_arr[j].addr + ds->ptr_offset;
+        }
+        if (p_arr[j].type == T_INT && !p_arr[j].seeloop) {
+            p_arr[j].seeloop = 1;
+            ds->nodes->push_back(j-ds->ptr_offset);
+        }
+	}
+    for (auto j: *(ds->roots)) {
+        reset_seeloop(p_arr, j, ds->ptr_offset);
+    }
+	// determine type of first node in ds 
+	unsigned int fnode_index = ds->nodes->front();
+	int types_per_struct [ds->ptr_offset];
+	for (int i = 0; i < ds->ptr_offset; i++) {
+		types_per_struct[i] = determine_type_onenode(p_arr, fnode_index+i, p_arr[fnode_index+i].raw_value);
+	}
+	// set all nodes in ds with the same types as first
+	finalize_types(p_arr, ds, types_per_struct);
+}
+
 void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct mem_struct *ds) {
 	// print out values between top of struct and first heap pointer in struct 
 	cout << "  (" << index << ") -> (";
@@ -121,8 +143,28 @@ void pretty_print_struct_entry(struct mem_ptr *p_arr, unsigned int index, struct
     cout << "): ||";
 	for (int i = 0; i < ds->ptr_offset; i++) {
 		uintptr_t elt = p_arr[index+i].raw_value;
-		int type = determine_type(p_arr, index, elt);
-		cout << " " << elt << " ( " << type << " ) || ";
+		uintptr_t type = p_arr[index+i].type;
+		if (type == T_INT) {
+			cout << " " << elt << " (int) || ";
+		}
+		if (type == T_HEAP) {
+			cout << " " << elt << " (heap) || ";
+		}
+		if (type == T_FUNC) {
+			cout << " " << elt << " (func) || ";
+		}
+		if (type == T_STR) {
+			uintptr_t copied_data [3];
+			memset(copied_data, 0, sizeof(copied_data[0]));
+			for (int j = 0; j < 3; j++) {
+				copied_data[j] = read_vuln(elt + 8*j);
+			}
+			printf(" %s (str) || ", copied_data); 
+			//cout << " " << elt << " (str) || ";
+		}
+		if (type == T_INVALID) {
+			cout << " " << elt << " (invalid) || ";
+		}
     }
     cout << endl;
 }
