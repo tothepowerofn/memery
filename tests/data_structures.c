@@ -25,6 +25,14 @@ int* generate_rand_sequence(int sz){
 	return seq;
 }
 
+int* generate_random_numbers(int sz, int min, int max){
+	int* seq = (int*)malloc(sz*sizeof(int));
+	for(int i=0; i<sz; ++i){
+		seq[i] = random_int(min, max);
+	}
+	return seq;
+}
+
 struct linked_list *linked_list_append_before(unsigned int value, struct linked_list *head) {
 	struct linked_list *new_head = (struct linked_list*) malloc(sizeof(struct linked_list));
 	printf("pointer to next node: %p\n", new_head);
@@ -49,11 +57,22 @@ struct doubly_linked_list *doubly_linked_list_append(unsigned int value, struct 
 }
 
 void traverse_doubly_linked(struct doubly_linked_list *head){
+	printf("--------------------------------\n");
+	printf("Traversing list at %p\n", head);
+	printf("--------------------------------\n");
 	struct doubly_linked_list *iterator = head;
-	while(iterator){
+	struct doubly_linked_list *non_repeat = NULL;
+	while(iterator && iterator != non_repeat){
+		if(iterator == head){
+			non_repeat = head; // we don't want to enter an infinite loop if the list is cyclic in some way
+		}
 		printf("h	%p	prev: %p, next: %p, value: %d \n\n", iterator, iterator->prev, iterator->next, iterator->value);
 		iterator = iterator->next;
 	}
+	if(iterator == head){
+		printf("NOTE: This list contains a cycle!\n");
+	}
+	printf("\n");
 }
 
 struct doubly_linked_list** simple_doubly_linked_test(int list_size, int num_lists){
@@ -72,14 +91,60 @@ struct doubly_linked_list** simple_doubly_linked_test(int list_size, int num_lis
 	return heads;
 }
 
+struct doubly_linked_list** simple_doubly_linked_circular_test(int list_size, int num_lists){
+	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	for (int i = 0; i < num_lists; i++) {
+		heads[i] = NULL;
+		struct doubly_linked_list *list = NULL;
+		for (int j = 0; j < list_size; j++) {
+			list = doubly_linked_list_append(100+j, list);
+			uint64_t* i_output = (uint64_t*) list;
+			if(!heads[i]){
+				heads[i] = list;
+			}
+		}
+		list->next = heads[i];
+		heads[i]->prev = list;
+	}
+	return heads;
+}
+
+struct doubly_linked_list** non_consecutive_doubly_linked_list(int list_size, int num_lists){
+	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	for(int i = 0; i<num_lists; ++i){
+		int* alloc_seq = generate_rand_sequence(list_size);
+		struct doubly_linked_list* structs = (struct doubly_linked_list*)malloc(sizeof(struct doubly_linked_list)*list_size);
+		struct doubly_linked_list* curr = NULL;
+		for(int j = 0; j<list_size; ++j){
+			struct doubly_linked_list* new_curr = &structs[alloc_seq[j]];
+			new_curr->next = NULL;
+			new_curr->value = j;
+			if(curr){
+				curr->next = new_curr;
+				new_curr->prev = curr;
+			}else{
+				heads[i] = new_curr;
+			}
+			curr = new_curr;
+		}
+	}
+	return heads;
+}
+
 struct doubly_linked_list** scattered_doubly_linked_list(int list_size, int num_lists, int freq_bogus){
 	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	if(freq_bogus < 1){
+		printf("Bogus frequency must be greater than 1!\n");
+		return NULL;
+	}
 	for (int i = 0; i < num_lists; i++) {
 		printf("\n");
 		heads[i] = NULL;
 		struct doubly_linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
-			if (random_int(0,freq_bogus) == 1 && j > 0){
+			int r = random_int(0,freq_bogus);
+			printf("%d\n", r);
+			if (r == 1){
 				list = doubly_linked_list_append(100+j, list);
 				printf("%p \n", list);
 				uint64_t* i_output = (uint64_t*) list;
@@ -90,6 +155,7 @@ struct doubly_linked_list** scattered_doubly_linked_list(int list_size, int num_
 				struct doubly_linked_list *new_head = (struct doubly_linked_list*) malloc(sizeof(struct doubly_linked_list)); //bogus allocation
 				new_head->value = 10; // avoid optimization out
 				--j; // we made a bogus node, so it shouldn't count towards our 10
+				printf("pointer to BOGUS node: %p\n", new_head);
 			}
 		
 		}
@@ -107,6 +173,124 @@ void simple_linked_list_test(int list_size, int num_lists){
 		}
 	}
 }
+
+struct binary_tree* insert_tree_val(struct binary_tree* t, int val, int fill_root){
+	if(t == NULL){
+		struct binary_tree* new_tree = (struct binary_tree*)malloc(sizeof(struct binary_tree));
+		new_tree->left = NULL;
+		new_tree->right=  NULL;
+		new_tree->value = val;
+		if(fill_root){
+			new_tree->root = new_tree;
+		}
+		return new_tree;
+	}
+	if(val < t->value){
+		if(t->left){
+			
+			return insert_tree_val(t->left, val, fill_root);
+		}
+		struct binary_tree* new_tree = (struct binary_tree*)malloc(sizeof(struct binary_tree));
+		new_tree->value = val;
+		new_tree->left = NULL;
+		new_tree->right=  NULL;
+		t->left = new_tree;
+		if(fill_root){
+			new_tree->root = t->root;
+		}
+		return new_tree;
+	}
+	if(val >= t->value){
+		if(t->right){
+			
+			return insert_tree_val(t->right, val, fill_root);
+		}
+		struct binary_tree* new_tree = (struct binary_tree*)malloc(sizeof(struct binary_tree));
+		new_tree->left = NULL;
+		new_tree->right=  NULL;
+		new_tree->value = val;
+		t->right = new_tree;
+		if(fill_root){
+			new_tree->root = t->root;
+		}
+		return new_tree;
+	}
+	return NULL;
+}
+
+struct binary_tree* simple_tree_no_root_test(int tree_size){
+	int* values = generate_random_numbers(tree_size, 0, tree_size*10);
+	struct binary_tree* root = NULL;
+	struct binary_tree* curr = NULL;
+	for(int i=0; i<tree_size; ++i){
+		curr = insert_tree_val(root, values[i], 0);
+		if(root == NULL){
+			root = curr;
+		}
+	}
+	printf("------------------------------------------\n");
+	printf("Created tree with values (in order):\n");
+	for(int i = 0; i<tree_size; ++i){
+		printf("%d\n", values[i]);
+	}
+	printf("------------------------------------------\n");
+
+	return root;
+}
+
+struct binary_tree* simple_tree_with_root_test(int tree_size){
+	int* values = generate_random_numbers(tree_size, 0, tree_size*10);
+	struct binary_tree* root = NULL;
+	struct binary_tree* curr = NULL;
+	for(int i=0; i<tree_size; ++i){
+		curr = insert_tree_val(root, values[i], 1);
+		if(root == NULL){
+			root = curr;
+		}
+	}
+	printf("------------------------------------------\n");
+	printf("Created tree with values (in order):\n");
+	for(int i = 0; i<tree_size; ++i){
+		printf("%d\n", values[i]);
+	}
+	printf("------------------------------------------\n");
+
+	return root;
+}
+
+//adapted from https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+void print_tree_util(struct binary_tree *root, int space) 
+{ 
+    // Base case 
+    if (root == NULL) 
+        return; 
+  
+    // Increase distance between levels 
+    space += 3; 
+  
+    // Process right child first 
+    print_tree_util(root->right, space); 
+  
+    // Print current node after space 
+    // count 
+    printf("\n"); 
+    for (int i = 3; i < space; i++) 
+        printf(" "); 
+    printf("%d\n", root->value); 
+  
+    // Process left child 
+    print_tree_util(root->left, space); 
+} 
+  
+// Wrapper over print2DUtil() 
+void print_tree(struct binary_tree *root) 
+{ 
+   // Pass initial space count as 0 
+   print_tree_util(root, 0); 
+} 
+  
+
+
 
 //freq_bogus is a parameter in [1,inf) specifying how often to bogus nodes. Greater = more bogus
 //Note: nodes are still consecutive, but at variable spacing
@@ -196,8 +380,10 @@ int main() {
 	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
 	//simple_cyclic_list(10);
-
+	//non_consecutive_doubly_linked_list(10,1);
 	traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
-	//exploit_loop();
+	//struct binary_tree* t = simple_tree_no_root_test(10);
+	//print_tree(t);
+	exploit_loop();
 	//sleep(10000);
 }
