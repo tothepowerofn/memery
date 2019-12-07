@@ -76,7 +76,8 @@ void traverse_doubly_linked(struct doubly_linked_list *head){
 }
 
 struct doubly_linked_list** simple_doubly_linked_test(int list_size, int num_lists){
-	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	//struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	struct doubly_linked_list* heads[10];
 	for (int i = 0; i < num_lists; i++) {
 		heads[i] = NULL;
 		struct doubly_linked_list *list = NULL;
@@ -92,7 +93,8 @@ struct doubly_linked_list** simple_doubly_linked_test(int list_size, int num_lis
 }
 
 struct doubly_linked_list** simple_doubly_linked_circular_test(int list_size, int num_lists){
-	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	//struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	struct doubly_linked_list* heads[5];
 	for (int i = 0; i < num_lists; i++) {
 		heads[i] = NULL;
 		struct doubly_linked_list *list = NULL;
@@ -110,7 +112,8 @@ struct doubly_linked_list** simple_doubly_linked_circular_test(int list_size, in
 }
 
 struct doubly_linked_list** non_consecutive_doubly_linked_list(int list_size, int num_lists){
-	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	//struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	struct doubly_linked_list* heads[5];
 	for(int i = 0; i<num_lists; ++i){
 		int* alloc_seq = generate_rand_sequence(list_size);
 		struct doubly_linked_list* structs = (struct doubly_linked_list*)malloc(sizeof(struct doubly_linked_list)*list_size);
@@ -132,7 +135,8 @@ struct doubly_linked_list** non_consecutive_doubly_linked_list(int list_size, in
 }
 
 struct doubly_linked_list** scattered_doubly_linked_list(int list_size, int num_lists, int freq_bogus){
-	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	//struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	struct doubly_linked_list* heads[10];
 	if(freq_bogus < 1){
 		printf("Bogus frequency must be greater than 1!\n");
 		return NULL;
@@ -157,7 +161,6 @@ struct doubly_linked_list** scattered_doubly_linked_list(int list_size, int num_
 				--j; // we made a bogus node, so it shouldn't count towards our 10
 				printf("pointer to BOGUS node: %p\n", new_head);
 			}
-		
 		}
 	}
 	return heads;
@@ -381,7 +384,10 @@ int main() {
     //simple_linked_tree(4);
 	//simple_cyclic_list(10);
 	//non_consecutive_doubly_linked_list(10,1);
-	traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
+	//struct binary_tree* t;
+	///t = insert_tree_val(t,);
+	print_tree(simple_tree_no_root_test(10));
+	//traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
 	//struct binary_tree* t = simple_tree_no_root_test(10);
 	//print_tree(t);
 	exploit_loop();
