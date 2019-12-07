@@ -43,22 +43,12 @@ int main(int argc, char *argv[]) {
 	}
 
     // TODO: Doubly-linked lists
-    // TODO: Differentiating between ds's in mixed program
-    // TODO: Binary trees
 	// TODO: Detect function pointers?!
-    // TODO: How to fine-tune depth/offsets? Ask Mickens.
 
     /* Meeting 12-2-2019 */
-    // TODO: Correctly classify a single datastructure even if nodes are non-consecutive 
     // TODO: Write non-consecutive test (Nathan)
-    // TODO: Make global bookkeeping for data structures (roots, num pointers, num nodes)
-    // TODO: Make separate code files for single, double linked datastructures. 
             // Doubly linked should run algorithm on existing singly linked bookkeeping
-    // TODO: Pretty-print different data structures (singly,doubly, etc.) and properties
     // TODO: Detect invariants 
-
-    // TODO: Dump RO segment (Nathan) <-- WE CANT DO THIS!!!! NOT IN THE ASSUMPTIONS WE MAKE (ONLY LEAK HEAP)
-    // TODO: Detect pointers to RO segment (Nathan)
 
     cout << endl;
     return 0;
