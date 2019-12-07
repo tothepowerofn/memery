@@ -1,6 +1,5 @@
 #include "data_structures.h"
 #include "exploit.h"
-
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,6 +8,21 @@
 int random_int(int min, int max)
 {
    return min + rand() % (max+1 - min);
+}
+
+int* generate_rand_sequence(int sz){
+	int* seq = (int*)malloc(sz*sizeof(int));
+	for(int i=0; i<sz; ++i){
+		seq[i] = i;
+	}
+	for(int i=0; i<sz; ++i){
+		int r1 = random_int(0,sz-1);
+		int r2 = random_int(0,sz-1);
+		int temp = seq[r1];
+		seq[r1] = seq[r2];
+		seq[r2] = temp;
+	}
+	return seq;
 }
 
 struct linked_list *linked_list_append_before(unsigned int value, struct linked_list *head) {
@@ -42,19 +56,45 @@ void traverse_doubly_linked(struct doubly_linked_list *head){
 	}
 }
 
-struct doubly_linked_list* simple_doubly_linked_test(int list_size, int num_lists){
-	struct doubly_linked_list* head = NULL;
+struct doubly_linked_list** simple_doubly_linked_test(int list_size, int num_lists){
+	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
 	for (int i = 0; i < num_lists; i++) {
+		heads[i] = NULL;
 		struct doubly_linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
 			list = doubly_linked_list_append(100+j, list);
 			uint64_t* i_output = (uint64_t*) list;
-			if(!head){
-				head = list;
+			if(!heads[i]){
+				heads[i] = list;
 			}
 		}
 	}
-	return head;
+	return heads;
+}
+
+struct doubly_linked_list** scattered_doubly_linked_list(int list_size, int num_lists, int freq_bogus){
+	struct doubly_linked_list** heads = (struct doubly_linked_list**)malloc(sizeof(struct doubly_linked_list**)*num_lists);
+	for (int i = 0; i < num_lists; i++) {
+		printf("\n");
+		heads[i] = NULL;
+		struct doubly_linked_list *list = NULL;
+		for (int j = 0; j < list_size; j++) {
+			if (random_int(0,freq_bogus) == 1 && j > 0){
+				list = doubly_linked_list_append(100+j, list);
+				printf("%p \n", list);
+				uint64_t* i_output = (uint64_t*) list;
+				if(!heads[i]){
+					heads[i] = list;
+				}
+			}else{
+				struct doubly_linked_list *new_head = (struct doubly_linked_list*) malloc(sizeof(struct doubly_linked_list)); //bogus allocation
+				new_head->value = 10; // avoid optimization out
+				--j; // we made a bogus node, so it shouldn't count towards our 10
+			}
+		
+		}
+	}
+	return heads;
 }
 
 void simple_linked_list_test(int list_size, int num_lists){
@@ -70,14 +110,15 @@ void simple_linked_list_test(int list_size, int num_lists){
 
 //freq_bogus is a parameter in [1,inf) specifying how often to bogus nodes. Greater = more bogus
 //Note: nodes are still consecutive, but at variable spacing
-void scattered_linked_list(int list_size, int num_lists, int freq_bogus){
+void scattered_singly_linked_list(int list_size, int num_lists, int freq_bogus){
 	if(freq_bogus < 1){
 		printf("Bogus frequency must be greater than 1!\n");
+		return;
 	}
 	for (int i = 0; i < num_lists; i++) {
 		struct linked_list *list = NULL;
 		for (int j = 0; j < list_size; j++) {
-			if (random_int(0,1) == 1){
+			if (random_int(0,freq_bogus) == 1){
 				list = linked_list_append_before(66, list);
 			}
 			else {
@@ -90,7 +131,7 @@ void scattered_linked_list(int list_size, int num_lists, int freq_bogus){
 	}
 }
 
-void non_consecutive_list(int list_size){ //makes a linked list whereby nodes are non-consecutive
+void non_consecutive_singly_linked_list(int list_size){ //makes a linked list whereby nodes are non-consecutive
 	// Make nodes
 	int* used = (int*)malloc(sizeof(int)*list_size);
 	struct linked_list** nodes = (struct linked_list**) malloc(sizeof(struct linked_list*)*list_size);
@@ -147,7 +188,7 @@ void simple_linked_tree(int depth) { // makes a binary tree with a given depth (
 
 int main() {
 	//Seed the random number generator so that it doesn't do the same sequence every time
-	//srand(time(NULL)); 
+	srand(time(NULL)); 
 	//Make a linked list with variably spaced nodes
 	//scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
@@ -155,7 +196,8 @@ int main() {
 	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
 	//simple_cyclic_list(10);
-	traverse_doubly_linked(simple_doubly_linked_test(10,1));
-	exploit_loop();
+
+	traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
+	//exploit_loop();
 	//sleep(10000);
 }
