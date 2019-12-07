@@ -259,33 +259,17 @@ struct binary_tree* simple_tree_with_root_test(int tree_size){
 }
 
 //adapted from https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
-void print_tree_util(struct binary_tree *root, int space) 
-{ 
-    // Base case 
-    if (root == NULL) 
-        return; 
-  
-    // Increase distance between levels 
-    space += 3; 
-  
-    // Process right child first 
-    print_tree_util(root->right, space); 
-  
-    // Print current node after space 
-    // count 
-    printf("\n"); 
-    for (int i = 3; i < space; i++) 
-        printf(" "); 
+void print_tree_util(struct binary_tree *root, int space) { 
+    if (root == NULL) return;
+
+    for (int i = 0; i < space; i++) printf("  "); 
     printf("%d\n", root->value); 
   
-    // Process left child 
-    print_tree_util(root->left, space); 
+    print_tree_util(root->left, space);
+    print_tree_util(root->right, space);
 } 
   
-// Wrapper over print2DUtil() 
-void print_tree(struct binary_tree *root) 
-{ 
-   // Pass initial space count as 0 
+void print_tree(struct binary_tree *root) {
    print_tree_util(root, 0); 
 } 
   
@@ -370,19 +354,37 @@ void simple_linked_tree(int depth) { // makes a binary tree with a given depth (
     simple_linked_tree_helper(depth, 2, root);
 }
 
+int simple_tree_helper(int depth, int n, struct binary_tree *root) {
+    root->value = n;
+    if (depth == 0) return n;
+    struct binary_tree *left = (struct binary_tree*) malloc(sizeof(struct binary_tree));
+    struct binary_tree *right = (struct binary_tree*) malloc(sizeof(struct binary_tree));
+    root->left = left;
+    root->right = right;
+    n = simple_tree_helper(depth-1, n+1, left);
+    n = simple_tree_helper(depth-1, n+1, right);
+    return n;
+}
+
+void simple_tree(int depth) { // makes a binary tree with a given depth (every node points to its parent)
+    struct binary_tree *root = (struct binary_tree*) malloc(sizeof(struct binary_tree));
+    simple_tree_helper(depth, 1, root);
+    print_tree(root);
+}
+
 int main() {
 	//Seed the random number generator so that it doesn't do the same sequence every time
 	srand(time(NULL)); 
 	//Make a linked list with variably spaced nodes
-	//scattered_linked_list(20,1,3);
+	scattered_linked_list(20,1,3);
 	//Make a list of non-consecutive nodes
 	//non_consecutive_list(10);
 	//simple_linked_list_test(10,1);
     //simple_linked_tree(4);
 	//simple_cyclic_list(10);
 	//non_consecutive_doubly_linked_list(10,1);
-	traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
-	//struct binary_tree* t = simple_tree_no_root_test(10);
+	//traverse_doubly_linked(simple_doubly_linked_test(10,1)[0]);
+	//simple_tree(4);
 	//print_tree(t);
 	exploit_loop();
 	//sleep(10000);

@@ -209,9 +209,11 @@ std::list<struct mem_struct*>* find_singly_linked_ds(struct mem_ptr* p_arr, unsi
 			}
 
             // check if we already found a datastructure that is a different part of this purported datastructure
+            // or if we found a datastructure within this purported datastructure with the same offset
             bool doubly_linked = false;
             for (int j = 0; j < offset; j++) {
-                if (ds && ds == p_arr[i-offset+j].ds) {
+                struct mem_struct *prev_ds = p_arr[i-offset+j].ds;
+                if (prev_ds && (prev_ds == ds || prev_ds->ptr_offset == offset)) {
                     doubly_linked = true;
                     break;
                 }
