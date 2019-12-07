@@ -10,7 +10,10 @@ def run_command(command):
 
 #Gets the assembly op from a line of ndisasm output
 def get_op_from_line(line):
-    return line.decode(encoding).split()[2] #ops are always the second in the list
+    try:
+        return line.decode(encoding).split()[2] #ops are always the second in the list
+    except:
+        return "BAD" #In case for some reason we don't get something at index 2
 
 #Gets the sequence of ops from the output of ndisasm 
 def get_op_seq(lines):

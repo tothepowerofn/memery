@@ -1,4 +1,5 @@
 #include "tests.h"
+#include <time.h>
 #define NUMNODES 10
 
 void traverse_doubly(struct doubly_linked_list *head){
@@ -11,7 +12,15 @@ void traverse_doubly(struct doubly_linked_list *head){
 		if(iterator == head){
 			non_repeat = head; // we don't want to enter an infinite loop if the list is cyclic in some way
 		}
-		printf("h	%p	prev: %p, next: %p, value: %d \n\n", iterator, iterator->prev, iterator->next, iterator->value);
+		printf("h	%p	prev: %p, next: %p, value: %d \n", iterator, iterator->prev, iterator->next, iterator->value);
+		if(iterator->prev){
+			printf("	prev value: %d \n", iterator->prev->value);
+		}
+		if(iterator->next){
+			printf("	next value: %d \n", iterator->next->value);
+		}
+		printf("\n");
+		
 		iterator = iterator->next;
 	}
 	if(iterator == head){
@@ -21,6 +30,7 @@ void traverse_doubly(struct doubly_linked_list *head){
 }
 
 int main(){
+	srand(time(NULL)); 
 	int alloc_seq[NUMNODES];
 	for(int i=0; i<NUMNODES; ++i){
 		alloc_seq[i] = i;
