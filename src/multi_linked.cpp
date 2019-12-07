@@ -54,11 +54,36 @@ list<struct multi_struct*>* find_multi_linked_ds(struct heap_entry *p_arr, list<
     return ms_list;
 }
 
+void compute_multi_invariants(struct multi_struct *ms) {
+    bool offsets[MAX_OFFSET];
+    for (int i = 0; i < MAX_OFFSET; i++) offsets[i] = false;
+    for (auto i : *(ms->single_structs))offsets[i->ptr_offset] = true;
+
+    int distinct_offsets = 0;
+    for (int i = 0; i < MAX_OFFSET; i++) {
+        if (offsets[i]) distinct_offsets++;
+    }
+
+    ms->distinct_offsets = distinct_offsets;
+
+    set<uintptr_t>* locations = new set<uintptr_t>;
+
+    for (auto i : *(ms->single_structs)) {
+        for (uintptr_t j : *(i->nodes)) {
+            locations->insert(j);
+        }
+    }
+    ms->distinct_nodes = locations->size();
+}
+
 void pretty_print_multistruct(struct multi_struct *ms) {
     cout << "Multistruct #" << ms->id << endl;
     cout << "Single structs: ";
     for (auto ds : *(ms->single_structs)) {
         cout << ds->id << " ";
     }
-    cout << endl << endl;
+    cout << endl;
+    cout << "Distinct offsets: " << ms->distinct_offsets << endl;
+    cout << "Distinct nodes: " << ms->distinct_nodes << endl;
+    cout << endl;
 }

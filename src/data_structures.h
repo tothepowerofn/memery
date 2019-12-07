@@ -22,6 +22,8 @@ struct single_struct {
 struct multi_struct {
     unsigned int id;
     list<struct single_struct*>* single_structs;
+    unsigned int distinct_offsets;
+    unsigned int distinct_nodes;
 };
 
 #endif

@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
     list<struct multi_struct*>* ms_list = find_multi_linked_ds(p_arr, ds_list);
 
     for (auto i : *(ms_list)) {
+        compute_multi_invariants(i);
         pretty_print_multistruct(i);
     }
 

@@ -49,5 +49,5 @@ int main(){
 		curr = new_curr;
 	}
 	traverse_doubly(root);
-
+    exploit_loop();
 }
