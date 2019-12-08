@@ -91,7 +91,6 @@ void dfs(uintptr_t index, struct heap_entry* p_arr, list<uintptr_t>* visited, in
 	}
 	else if (flag == 1) {
 		graph = p_arr[index].reverse_graph;
-		cout << "REMOVING INDEX" << endl;
 		visited->push_back(index);
 	}
 	for (auto i : *(graph)) { 
@@ -145,6 +144,7 @@ void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr)
 		create_reverse_graph(i, p_arr);
 	}
 
+	/*
 	for (auto i : *(ms->single_structs)) {
 		cout << "FORWARD GRAPH: " << endl;
 		for (auto n: *(i->nodes)) {
@@ -162,6 +162,7 @@ void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr)
 			}
 		}
 	}
+	*/
 
 	// TODO: need to make some sort of merged graph of all the single ds
 
@@ -181,7 +182,11 @@ void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr)
 	cout << "NODES VISITED ON reverse DFS: " << reverse_visited->size() << endl;
 
 	if (forward_visited->size() != ms->distinct_nodes ||reverse_visited->size() != ms->distinct_nodes) {
+		ms->whole_scc = 0;
 		cout << "DID NOT FIND SCC" << endl;
+	}
+	else {
+		ms->whole_scc = 1;
 	}
 }
 

@@ -28,6 +28,7 @@ struct multi_struct {
     list<struct single_struct*>* single_structs;
     unsigned int distinct_offsets;
     unsigned int distinct_nodes;
+	int whole_scc; 
     //list<list<uintptr_t>>* ms_forward_graph;
     //list<list<uintptr_t>>* ms_reverse_graph;
 };
