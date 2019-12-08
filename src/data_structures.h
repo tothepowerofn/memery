@@ -16,6 +16,10 @@ struct single_struct {
     unsigned int size;
 	list<uintptr_t>* roots;
     list<uintptr_t>* nodes;
+
+    //list<list<uintptr_t>>* forward_graph;
+    //list<list<uintptr_t>>* reverse_graph;
+
     struct multi_struct *ms;
 };
 
@@ -24,6 +28,8 @@ struct multi_struct {
     list<struct single_struct*>* single_structs;
     unsigned int distinct_offsets;
     unsigned int distinct_nodes;
+    //list<list<uintptr_t>>* ms_forward_graph;
+    //list<list<uintptr_t>>* ms_reverse_graph;
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "cd2mem.h"
 #include "data_structures.h"
+#include <algorithm>
 
 #include <iostream>
 #include <set>
@@ -81,78 +82,108 @@ void compute_distinct_nodes(struct multi_struct *ms) {
     ms->distinct_nodes = locations->size();
 }
 
-/*int dfs(uintptr_t index, struct heap_entry* p_arr, bool* visited) {
-	// list for visited
-	visited[index] = true;
+void dfs(uintptr_t index, struct heap_entry* p_arr, list<uintptr_t>* visited, int flag) {
 	// iterate through all the nodes that current index can chase
-	for ( 
-		visited[index] = true;
-		index = index + p_arr[index].addr + p_arr[index].ds->offset;
+	list<uintptr_t>* graph;
+	if (flag == 0) {
+		graph = p_arr[index].forward_graph;
+		visited->push_back(index);
 	}
-	
-}*/
+	else if (flag == 1) {
+		graph = p_arr[index].reverse_graph;
+		cout << "REMOVING INDEX" << endl;
+		visited->remove(index);
+	}
+	for (auto i : *(graph)) { 
+		// check if index has already been visited
+		list<uintptr_t>::iterator it;
+		it = find(visited->begin(), visited->end(), index);
+		// if not been visited, start another dfs
+		if (it == visited->end()) {
+			dfs(i, p_arr, visited, flag);
+		}
+	}
+}
 
-void create_forward_graph(struct single_struct *ds, struct heap_entry* p_arr) {
-	// create forward graph
+void create_forward_graph(struct single_struct* ds, struct heap_entry* p_arr) {
+	// iterate through all nodes, and add edges to the forward graph
 	for (auto i : *(ds->nodes)) {
-   		list<uintptr_t>* forward_graph = new list<uintptr_t>;
-		p_arr[i].forward_graph = forward_graph;
 		if (p_arr[i+ds->ptr_offset].type == 1) {
+			//cout << "node i: " << i << " forward graph contains: " << p_arr[i+ds->ptr_offset].addr << endl;
 			p_arr[i].forward_graph->push_back(p_arr[i+ds->ptr_offset].addr);
 		}
-		//cout << "CURRENT NODE: " << i << " POINTS TO ADDR: " << p_arr[i+ds->ptr_offset].addr << endl;
 	}
-	// testing
-	 
-	for (auto i : *(ds->nodes)) {
-		//cout << "NEW ITERATION" << endl;
-		//cout << "LENGTH OF FORWARD GRAPH: " << p_arr[i].forward_graph->size();
-		for (auto j: *(p_arr[i].forward_graph)) {
-			//cout << j << endl;
-		}
-	}
-
 }
 
-void create_reverse_graph(struct single_struct *ds, struct heap_entry* p_arr) {
+void create_reverse_graph(struct single_struct* ds, struct heap_entry* p_arr) {
+	// iterate through all nodes, and add edges to the reverse graph
 	for (auto i : *(ds->nodes)) {
-   		list<uintptr_t>* reverse_graph = new list<uintptr_t>;
-		p_arr[i].reverse_graph = reverse_graph;
 		for (auto j : *(p_arr[i].forward_graph)) {
-			p_arr[i].reverse_graph->push_back(j);
+			//cout << "forward graph contains: " << j << endl;
+			p_arr[j].reverse_graph->push_back(i);
 		}
 	} 
-	// testing
-	for (auto i : *(ds->nodes)) {
-		//cout << "NEW ITERATION" << endl;
-		//cout << "LENGTH OF FORWARD GRAPH: " << p_arr[i].forward_graph->size();
-		for (auto j: *(p_arr[i].reverse_graph)) {
-			//cout << j << endl;
-		}
-	}
 }
+
 
 void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
 	compute_distinct_offsets(ms);
 	compute_distinct_nodes(ms);
-	// compute if the entire combination of single structs is a SCC
-	for (auto i : *(ms->single_structs)) {
-		//cout << "FORWARD GRAPH" << endl;
-		create_forward_graph(i, p_arr);
+	
+	// initalize graphs
+	for (auto i: *(ms->single_structs)) {
+		for (auto n: *(i->nodes)) {
+   			list<uintptr_t>* forward_graph = new list<uintptr_t>;
+			p_arr[n].forward_graph = forward_graph;
+   			list<uintptr_t>* reverse_graph = new list<uintptr_t>;
+			p_arr[n].reverse_graph = reverse_graph;
+		}
 	}
+
 	for (auto i : *(ms->single_structs)) {
-		//cout << "REVERSE GRAPH" << endl;
+		create_forward_graph(i, p_arr);
 		create_reverse_graph(i, p_arr);
 	}
 
-	/*
-	// compute if single struct is SCC
-	for (auto ds : *(ms->single_structs)) {
-		bool visited [ds->size];
-		for (auto index : *(ds->nodes)){
-			uintptr_t forward_dfs = dfs(index, p_arr, p_arr[index].forward_graph, visited);
+	for (auto i : *(ms->single_structs)) {
+		cout << "FORWARD GRAPH: " << endl;
+		for (auto n: *(i->nodes)) {
+			for (auto j : *(p_arr[n].forward_graph)) {
+				cout << "NODE i: " << n << " POINTS TO: " << j << endl;
+			}
 		}
 	}
+
+	for (auto i : *(ms->single_structs)) {
+		cout << "REVERSE GRAPH: " << endl;
+		for (auto n : *(i->nodes)) {
+			for (auto j: *(p_arr[n].reverse_graph)) {
+				cout << "NODE i: " << n << " POINTS TO: " << j << endl;
+			}
+		}
+	}
+
+	// TODO: need to make some sort of merged graph of all the single ds
+
+	// compute if single struct is SCC
+	// pick an arbitrary node
+	struct single_struct* ds = ms->single_structs->front();
+	uintptr_t fnode = ds->nodes->front();
+
+   	list<uintptr_t>* forward_visited = new list<uintptr_t>;
+	dfs(fnode, p_arr, forward_visited, 0);
+
+	cout << "NODES VISITED ON FORWARD DFS: " << forward_visited->size() << endl;
+
+	// dfs on reverse graph
+	/*
+	cout << "ABOUT TO START REVERSE DFS WITH NODE: " << ds->nodes->front() << endl;
+   	list<uintptr_t>* reverse_visited = forward_visited; 
+	dfs(ds->nodes->front(), p_arr, reverse_visited, 1);
+	if (reverse_visited != 0) {
+		cout << "DID NOT FIND SCC" << endl;
+	}
+	cout << "NODES VISITED ON reverse DFS: " << reverse_visited->size() << endl;
 	*/
 }
 
