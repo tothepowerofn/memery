@@ -9,6 +9,6 @@
 void pretty_print_multistruct(struct multi_struct *ms);
 void assign_ms(struct multi_struct *ms, struct single_struct **ds_arr, set<int> intersecting_ds, int ds);
 list<struct multi_struct*>* find_multi_linked_ds(struct heap_entry *p_arr, list<struct single_struct*>* ds_list);
-void compute_multi_invariants(struct multi_struct *ms);
+void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr);
 
 #endif

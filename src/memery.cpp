@@ -46,16 +46,10 @@ int main(int argc, char *argv[]) {
     list<struct multi_struct*>* ms_list = find_multi_linked_ds(p_arr, ds_list);
 
     for (auto i : *(ms_list)) {
-        compute_multi_invariants(i);
+        compute_multi_invariants(i, p_arr);
         pretty_print_multistruct(i);
     }
 
-    // TODO: Doubly-linked lists
-	// TODO: Detect function pointers?!
-
-    /* Meeting 12-2-2019 */
-    // TODO: Write non-consecutive test (Nathan)
-            // Doubly linked should run algorithm on existing singly linked bookkeeping
     // TODO: Detect invariants 
 
     cout << endl;

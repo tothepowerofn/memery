@@ -27,6 +27,9 @@ struct heap_entry {
 	uintptr_t addr;
 	unsigned int type;
 
+    list<uintptr_t>* forward_graph;
+    list<uintptr_t>* reverse_graph;
+
     struct single_struct *ds; // non-null if this address is the pointer in a singly-linked datastructure
 };
 

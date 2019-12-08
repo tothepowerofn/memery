@@ -54,26 +54,87 @@ list<struct multi_struct*>* find_multi_linked_ds(struct heap_entry *p_arr, list<
     return ms_list;
 }
 
-void compute_multi_invariants(struct multi_struct *ms) {
+void compute_distinct_offsets(struct multi_struct *ms) {
+	// initalize offset array
     bool offsets[MAX_OFFSET];
     for (int i = 0; i < MAX_OFFSET; i++) offsets[i] = false;
-    for (auto i : *(ms->single_structs))offsets[i->ptr_offset] = true;
-
+    for (auto i : *(ms->single_structs)) offsets[i->ptr_offset] = true;
+	// look for distinct offsets
     int distinct_offsets = 0;
     for (int i = 0; i < MAX_OFFSET; i++) {
         if (offsets[i]) distinct_offsets++;
     }
-
+	// set the number of distinct offsets in multistruct 
     ms->distinct_offsets = distinct_offsets;
+}
 
+void compute_distinct_nodes(struct multi_struct *ms) {
+	// initalize set for number of total nodes in multistruct
     set<uintptr_t>* locations = new set<uintptr_t>;
-
+	// append nodes to set
     for (auto i : *(ms->single_structs)) {
         for (uintptr_t j : *(i->nodes)) {
             locations->insert(j);
         }
     }
+	// set the number of distinct nodes in multistruct
     ms->distinct_nodes = locations->size();
+}
+
+/*void dfs(uintptr_t index, struct heap_entry* p_arr, bool* visited) {
+	// list for visited
+	visited[index] = true;
+	// iterate through all the nodes that current index can chase
+	while (p_arr[index] == 1) { 
+		visited[index] = true;
+		index = index + p_arr[index].addr + p_arr[index].ds->offset;
+	}
+	
+}*/
+
+void create_forward_graph(struct single_struct *ds, struct heap_entry* p_arr) {
+	// create forward graph
+	for (auto i : *(ds->nodes)) {
+		p_arr[i].forward_graph->push_back(p_arr[i].addr);
+	}
+	// testing
+	for (auto i : *(ds->nodes)) {
+		for (auto j: *(p_arr[i].forward_graph)) {
+			cout << j << endl;
+		}
+	}
+}
+
+/*void create_reverse_graph(struct single_struct *ds, struct heap_entry* p_arr) {
+	for (auto i : *(ds->nodes)) {
+		for (auto j : *(ds->forward_graph)) {
+			
+		}
+	} 
+}*/
+
+void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
+	compute_distinct_offsets(ms);
+	compute_distinct_nodes(ms);
+	// compute if the entire combination of single structs is a SCC
+	// compute if per single struct is SCC
+	for (auto i : *(ms->single_structs)) {
+		create_forward_graph(i, p_arr);
+	}
+
+	/*
+	for (auto i : *(ms->single_struct)) {
+		create_reverse_graph(i, p_arr);
+	}
+
+	for (auto i : *(ms->single_structs)) {
+		bool visited [i->size];
+		for (auto j : *(i->nodes)){
+			dfs(j, p_arr, visited);
+		}
+		compute_single_scc(i, p_arr, visited);
+	}
+	*/
 }
 
 void pretty_print_multistruct(struct multi_struct *ms) {
