@@ -73,6 +73,10 @@ void upgrade_root(struct heap_entry* p_arr, uintptr_t index, uintptr_t pointing_
 }
 
 int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr_t elt) {
+	if (p_arr[index].type == T_HEAP) {
+		cout << "I SHOULD SEE THIS MESSAGE DAFJADKFJALKSDFJADKLS;F" << endl;
+		return p_arr[index].type;
+	}
 	// copy bytes pointed to by current address
 	uintptr_t copied_data [3];
 	for (int j = 0; j < 3; j++) {
@@ -91,12 +95,14 @@ int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr
 		p_arr[index].type = T_STR;
 		return p_arr[index].type;
 	}
+	return T_INT;
 }
 
 void finalize_types(struct heap_entry* p_arr, struct single_struct *ds, int* types_per_struct ) {
 	// assign this set of types to all nodes in ds
+	cout << "TYPES PER STRUCT" << endl;
 	for (int i = 0; i < ds->ptr_offset; i++) {
-		// cout << types_per_struct[i] << endl;
+		cout << types_per_struct[i] << endl;
 	}
 	// loop through all the nodes in the ds
 	for (auto n: *(ds->nodes)) {
@@ -124,9 +130,13 @@ void finalize_nodes(struct heap_entry* p_arr, struct single_struct *ds) {
     for (auto j: *(ds->roots)) {
         reset_seeloop(p_arr, j, ds->ptr_offset);
     }
+	
 	// determine type of first node in ds 
 	unsigned int fnode_index = ds->nodes->front();
 	int types_per_struct [ds->ptr_offset];
+	for (int i = 0; i < ds->ptr_offset; i++) {
+		cout << "TYPES BEFORE CALLING DET_ONENODE: " << p_arr[fnode_index+i].type << endl;
+	}
 	for (int i = 0; i < ds->ptr_offset; i++) {
 		types_per_struct[i] = determine_type_onenode(p_arr, fnode_index+i, p_arr[fnode_index+i].raw_value);
 	}

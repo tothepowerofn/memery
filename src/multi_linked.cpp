@@ -81,11 +81,11 @@ void compute_distinct_nodes(struct multi_struct *ms) {
     ms->distinct_nodes = locations->size();
 }
 
-/*void dfs(uintptr_t index, struct heap_entry* p_arr, bool* visited) {
+/*int dfs(uintptr_t index, struct heap_entry* p_arr, bool* visited) {
 	// list for visited
 	visited[index] = true;
 	// iterate through all the nodes that current index can chase
-	while (p_arr[index] == 1) { 
+	for ( 
 		visited[index] = true;
 		index = index + p_arr[index].addr + p_arr[index].ds->offset;
 	}
@@ -95,44 +95,63 @@ void compute_distinct_nodes(struct multi_struct *ms) {
 void create_forward_graph(struct single_struct *ds, struct heap_entry* p_arr) {
 	// create forward graph
 	for (auto i : *(ds->nodes)) {
-		p_arr[i].forward_graph->push_back(p_arr[i].addr);
+   		list<uintptr_t>* forward_graph = new list<uintptr_t>;
+		p_arr[i].forward_graph = forward_graph;
+		if (p_arr[i+ds->ptr_offset].type == 1) {
+			p_arr[i].forward_graph->push_back(p_arr[i+ds->ptr_offset].addr);
+		}
+		//cout << "CURRENT NODE: " << i << " POINTS TO ADDR: " << p_arr[i+ds->ptr_offset].addr << endl;
 	}
 	// testing
+	 
 	for (auto i : *(ds->nodes)) {
+		//cout << "NEW ITERATION" << endl;
+		//cout << "LENGTH OF FORWARD GRAPH: " << p_arr[i].forward_graph->size();
 		for (auto j: *(p_arr[i].forward_graph)) {
-			cout << j << endl;
+			//cout << j << endl;
+		}
+	}
+
+}
+
+void create_reverse_graph(struct single_struct *ds, struct heap_entry* p_arr) {
+	for (auto i : *(ds->nodes)) {
+   		list<uintptr_t>* reverse_graph = new list<uintptr_t>;
+		p_arr[i].reverse_graph = reverse_graph;
+		for (auto j : *(p_arr[i].forward_graph)) {
+			p_arr[i].reverse_graph->push_back(j);
+		}
+	} 
+	// testing
+	for (auto i : *(ds->nodes)) {
+		//cout << "NEW ITERATION" << endl;
+		//cout << "LENGTH OF FORWARD GRAPH: " << p_arr[i].forward_graph->size();
+		for (auto j: *(p_arr[i].reverse_graph)) {
+			//cout << j << endl;
 		}
 	}
 }
-
-/*void create_reverse_graph(struct single_struct *ds, struct heap_entry* p_arr) {
-	for (auto i : *(ds->nodes)) {
-		for (auto j : *(ds->forward_graph)) {
-			
-		}
-	} 
-}*/
 
 void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
 	compute_distinct_offsets(ms);
 	compute_distinct_nodes(ms);
 	// compute if the entire combination of single structs is a SCC
-	// compute if per single struct is SCC
 	for (auto i : *(ms->single_structs)) {
+		//cout << "FORWARD GRAPH" << endl;
 		create_forward_graph(i, p_arr);
 	}
-
-	/*
-	for (auto i : *(ms->single_struct)) {
+	for (auto i : *(ms->single_structs)) {
+		//cout << "REVERSE GRAPH" << endl;
 		create_reverse_graph(i, p_arr);
 	}
 
-	for (auto i : *(ms->single_structs)) {
-		bool visited [i->size];
-		for (auto j : *(i->nodes)){
-			dfs(j, p_arr, visited);
+	/*
+	// compute if single struct is SCC
+	for (auto ds : *(ms->single_structs)) {
+		bool visited [ds->size];
+		for (auto index : *(ds->nodes)){
+			uintptr_t forward_dfs = dfs(index, p_arr, p_arr[index].forward_graph, visited);
 		}
-		compute_single_scc(i, p_arr, visited);
 	}
 	*/
 }
