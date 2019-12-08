@@ -62,11 +62,14 @@ void compute_distinct_offsets(struct multi_struct *ms) {
     for (auto i : *(ms->single_structs)) offsets[i->ptr_offset] = true;
 	// look for distinct offsets
     int distinct_offsets = 0;
+    int max_offset = -1;
     for (int i = 0; i < MAX_OFFSET; i++) {
         if (offsets[i]) distinct_offsets++;
+        if (offsets[i] && i > max_offset) max_offset = i;
     }
 	// set the number of distinct offsets in multistruct 
     ms->distinct_offsets = distinct_offsets;
+    ms->max_offset = max_offset;
 }
 
 void compute_distinct_nodes(struct multi_struct *ms) {
@@ -124,20 +127,21 @@ void create_reverse_graph(struct single_struct* ds, struct heap_entry* p_arr) {
 	} 
 }
 
+void reset_graphs(struct heap_entry* p_arr, struct multi_struct *ms) {
+    for (auto j : *(ms->single_structs)) {
+        for (auto k : *(j->nodes)) {
+            p_arr[k].forward_graph = new list<uintptr_t>;
+            p_arr[k].reverse_graph = new list<uintptr_t>;
+        }
+    }
+}
 
 void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
 	compute_distinct_offsets(ms);
 	compute_distinct_nodes(ms);
 	
 	// initalize graphs
-	for (auto i: *(ms->single_structs)) {
-		for (auto n: *(i->nodes)) {
-   			list<uintptr_t>* forward_graph = new list<uintptr_t>;
-			p_arr[n].forward_graph = forward_graph;
-   			list<uintptr_t>* reverse_graph = new list<uintptr_t>;
-			p_arr[n].reverse_graph = reverse_graph;
-		}
-	}
+    reset_graphs(p_arr, ms);
 
 	for (auto i : *(ms->single_structs)) {
 		create_forward_graph(i, p_arr);
@@ -188,6 +192,31 @@ void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr)
 	else {
 		ms->whole_scc = 1;
 	}
+
+    ms->each_offset_scc = true;
+    for (int i = 0; i < ms->max_offset + 1; i++) {
+        reset_graphs(p_arr, ms);
+        bool found_offset = false;
+        for (auto j : *(ms->single_structs)) {
+            if (j->ptr_offset == i) {
+                found_offset = true;
+                create_forward_graph(j, p_arr);
+                create_reverse_graph(j, p_arr);
+            }
+        }
+        cout << "Found offset " << i << " " << found_offset << endl;
+        if (!found_offset) continue;
+
+        forward_visited = new list<uintptr_t>;
+        reverse_visited = new list<uintptr_t>;
+        uintptr_t fnode = ms->single_structs->front()->nodes->front();
+        dfs(fnode, p_arr, forward_visited, 0);
+        dfs(fnode, p_arr, reverse_visited, 1);
+
+	    if (forward_visited->size() != ms->distinct_nodes || reverse_visited->size() != ms->distinct_nodes) {
+		    ms->each_offset_scc = false;
+        }
+   }
 }
 
 void pretty_print_multistruct(struct multi_struct *ms) {
@@ -199,5 +228,21 @@ void pretty_print_multistruct(struct multi_struct *ms) {
     cout << endl;
     cout << "Distinct offsets: " << ms->distinct_offsets << endl;
     cout << "Distinct nodes: " << ms->distinct_nodes << endl;
+    cout << "Max offset: " << ms->max_offset << endl;
+    cout << endl;
+    cout << "Overall strongly connected?: " << (ms->whole_scc ? "Yes" : "No") << endl;
+    cout << "Offset-wise strongly connected?: " << (ms->each_offset_scc ? "Yes" : "No") << endl;
+    cout << endl;
+    
+    cout << "Consistent with: ";
+    if (ms->distinct_offsets == 1) {
+        if (ms->whole_scc) cout << "circular-singly-linked-list";
+        else cout << "linear-singly-linked-list, reverse-binary-tree";
+    } else if (ms->distinct_offsets == 2) {
+        if (ms->whole_scc) {
+            if (ms->each_offset_scc) cout << "circular-doubly-linked-list";
+            else cout << "linear-doubly-linked-list";
+        } else cout << "binary-tree";
+    }
     cout << endl;
 }
