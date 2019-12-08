@@ -92,12 +92,12 @@ void dfs(uintptr_t index, struct heap_entry* p_arr, list<uintptr_t>* visited, in
 	else if (flag == 1) {
 		graph = p_arr[index].reverse_graph;
 		cout << "REMOVING INDEX" << endl;
-		visited->remove(index);
+		visited->push_back(index);
 	}
 	for (auto i : *(graph)) { 
 		// check if index has already been visited
 		list<uintptr_t>::iterator it;
-		it = find(visited->begin(), visited->end(), index);
+		it = find(visited->begin(), visited->end(), i);
 		// if not been visited, start another dfs
 		if (it == visited->end()) {
 			dfs(i, p_arr, visited, flag);
@@ -176,15 +176,13 @@ void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr)
 	cout << "NODES VISITED ON FORWARD DFS: " << forward_visited->size() << endl;
 
 	// dfs on reverse graph
-	/*
-	cout << "ABOUT TO START REVERSE DFS WITH NODE: " << ds->nodes->front() << endl;
-   	list<uintptr_t>* reverse_visited = forward_visited; 
-	dfs(ds->nodes->front(), p_arr, reverse_visited, 1);
-	if (reverse_visited != 0) {
+   	list<uintptr_t>* reverse_visited = new list<uintptr_t>;
+	dfs(fnode, p_arr, reverse_visited, 1);
+	cout << "NODES VISITED ON reverse DFS: " << reverse_visited->size() << endl;
+
+	if (forward_visited->size() != ms->distinct_nodes ||reverse_visited->size() != ms->distinct_nodes) {
 		cout << "DID NOT FIND SCC" << endl;
 	}
-	cout << "NODES VISITED ON reverse DFS: " << reverse_visited->size() << endl;
-	*/
 }
 
 void pretty_print_multistruct(struct multi_struct *ms) {
