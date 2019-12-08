@@ -84,18 +84,13 @@ int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr
 	}
 	// check for function pointer
 	int func_ptr = is_func_ptr((char*) copied_data, 24);
-	if (func_ptr == 1) {
-		p_arr[index].type = T_FUNC;
-		return p_arr[index].type;
-	}
+	if (func_ptr == 1) return T_FUNC;
 	// check for string
 	char* acceptable_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	int is_str = classify_as_ascii((char*) copied_data, acceptable_chars, 3);
-	if (is_str == 1) {
-		p_arr[index].type = T_STR;
-		return p_arr[index].type;
-	}
-	return T_INT;
+	if (is_str == 1) return T_STR;
+
+    return p_arr[index].type;
 }
 
 void finalize_types(struct heap_entry* p_arr, struct single_struct *ds, int* types_per_struct ) {
@@ -108,7 +103,9 @@ void finalize_types(struct heap_entry* p_arr, struct single_struct *ds, int* typ
 	for (auto n: *(ds->nodes)) {
 		// traverse down each element in node
 		for (int i = 0; i < ds->ptr_offset; i++) {
-			p_arr[n+i].type = types_per_struct[i];
+            // don't overwrite heap designation if, for instance, the first node in the DS happens
+            // to have a null value for this field
+			if (p_arr[n+i].type != T_HEAP) p_arr[n+i].type = types_per_struct[i];
 		}
 	}
 }
