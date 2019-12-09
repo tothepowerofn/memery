@@ -29,28 +29,12 @@ struct heap_entry {
 
     list<uintptr_t>* forward_graph;
     list<uintptr_t>* reverse_graph;
-    //list<list<uintptr_t>>* ms_forward_graph;
-    //list<list<uintptr_t>>* ms_reverse_graph;
 
     struct single_struct *ds; // non-null if this address is the pointer in a singly-linked datastructure
 };
 
-uintptr_t ascii_hex_to_ptr(char* hexstring);
-
-unsigned char read_byte(uintptr_t addr);
-unsigned int read_int(uintptr_t addr);
-
-uintptr_t heap_start();
-uintptr_t heap_end();
-
-void set_heap_start(uintptr_t addr);
-void set_heap_end(uintptr_t addr);
-
-uintptr_t get_val(uintptr_t rel_start);
 uintptr_t to_addr(uintptr_t addr);
-
 void init_pointers(struct heap_entry *p_arr, unsigned int num_p);
-
-int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii);
+int classify_as_ascii(char* mem, const char* acceptable_chars, int num_consec_ascii);
 
 #endif

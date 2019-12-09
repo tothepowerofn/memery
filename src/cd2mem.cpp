@@ -13,35 +13,8 @@ extern uintptr_t starting_addr;
 extern uintptr_t ending_addr;
 extern char* memblock;
 
-uintptr_t ascii_hex_to_ptr(char* hexstring){
-    return (uintptr_t)strtol(hexstring, NULL, 0);
-}
-
-unsigned char read_byte(uintptr_t addr){
-    return *(memblock - (char*)starting_addr + (char*)addr);
-}
-
-unsigned int read_int(uintptr_t addr){
-    return *((unsigned int*)memblock - (unsigned int*)starting_addr + (unsigned int*)addr);
-}
-
-uintptr_t heap_start(){
-    return starting_addr;
-}
-
-uintptr_t heap_end(){
-    return ending_addr;
-}
-
-void set_heap_start(uintptr_t addr){
-    starting_addr = addr;
-}
-
-void set_heap_end(uintptr_t addr){
-    ending_addr = addr;
-}
-
 uintptr_t to_addr(uintptr_t addr) {
+	// log to test address values
 	FILE *fptr = fopen("cd2mem.log", "a");
 	uintptr_t potential_addr = addr - (uintptr_t) starting_addr;
 	fprintf(fptr, "Addr: %lu\n", potential_addr);
@@ -50,7 +23,7 @@ uintptr_t to_addr(uintptr_t addr) {
 }
 	
 void init_pointers(struct heap_entry *p_arr, unsigned int num_p) {
-    /* copy values from dump */
+    //copy values from dump
     for (uint64_t i = 0; i < num_p; i++) {
 		// call read_8bytes to get the next 8 bytes of the heap starting at i
 		uintptr_t val = read_vuln(i*8 + starting_addr);
@@ -70,15 +43,13 @@ void init_pointers(struct heap_entry *p_arr, unsigned int num_p) {
 		}
         else {
 			p_arr[i].type = T_HEAP;
-			//cout << "CURRENT FILE INDEX: " << i << " POINTS TO: " << p_arr[i].addr << endl;
-			//cout << "WHAT DOES THE STRUCT LOOK LIKE?! " << get_val(p_arr[i].addr*8) << endl;
 		}
     }
 }
 
 //mem = memory to test to see if string, acceptable_chars = ascii chars to accept, num_consec_ascii
 // = number of acceptable consecutive ascii required to be classified as string.
-int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii){
+int classify_as_ascii(char* mem, const char* acceptable_chars, int num_consec_ascii){
 	for(int i = 0; i<num_consec_ascii; ++i){
 		int round_passed = 0;
 		for(int j = 0;j<strlen(acceptable_chars); ++j){
@@ -92,4 +63,3 @@ int classify_as_ascii(char* mem, char* acceptable_chars, int num_consec_ascii){
 	}
 	return 1;
 }
-

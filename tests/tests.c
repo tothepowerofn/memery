@@ -48,9 +48,9 @@ struct doubly_linked_list *doubly_linked_list_append(unsigned int value, struct 
 	if (head) {
 		head->next = new_head;
 		new_head->prev = head;
-		printf("h	%p	prev: %p, next: %p, value: %d \n", head, head->prev, head->next, head->value);
+		//printf("h	%p	prev: %p, next: %p, value: %d \n", head, head->prev, head->next, head->value);
 	}
-	printf("nh	%p	prev: %p, next: %p, value: %d \n\n", new_head, new_head->prev, new_head->next, new_head->value);
+	//printf("nh	%p	prev: %p, next: %p, value: %d \n\n", new_head, new_head->prev, new_head->next, new_head->value);
 	return new_head;
 }
 

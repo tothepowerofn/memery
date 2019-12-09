@@ -12,7 +12,7 @@ void traverse_singly(struct linked_list *head){
 		if(iterator == head){
 			non_repeat = head; // we don't want to enter an infinite loop if the list is cyclic in some way
 		}
-		printf("h	%p, next: %p, value: %d \n\n", iterator, iterator->next, iterator->value);
+		printf("h	%p, next: %p, value: %lu \n\n", iterator, iterator->next, iterator->value);
 		iterator = iterator->next;
 	}
 	if(iterator == head){
@@ -46,13 +46,13 @@ int main(){
 		nodes[seq[i]].next = NULL;
 		if(node == NULL){
 			node = &nodes[seq[i]];
-			printf("Val: %d Curr: %p Next: %p\n", node->value, node, node->next);
+			printf("Val: %lu Curr: %p Next: %p\n", node->value, node, node->next);
 			root = node;
 			continue;
 		}
 		node->next = &nodes[seq[i]];
-		printf("Value: %d Curr: %p Next: %p\n", node->value, node, node->next);
-		printf("root 	Value: %d Curr: %p Next: %p\n", root->value, root, root->next);
+		printf("Value: %lu Curr: %p Next: %p\n", node->value, node, node->next);
+		printf("root 	Value: %lu Curr: %p Next: %p\n", root->value, root, root->next);
 		node = &nodes[seq[i]];
 	}
 

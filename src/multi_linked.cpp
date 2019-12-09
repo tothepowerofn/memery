@@ -90,6 +90,7 @@ void compute_distinct_nodes(struct multi_struct *ms) {
 void dfs(uintptr_t index, struct heap_entry* p_arr, list<uintptr_t>* visited, int flag) {
 	// iterate through all the nodes that current index can chase
 	list<uintptr_t>* graph;
+	// check if we are doing an dfs on forward or reverse graph
 	if (flag == 0) {
 		graph = p_arr[index].forward_graph;
 		visited->push_back(index);
@@ -113,7 +114,6 @@ void create_forward_graph(struct single_struct* ds, struct heap_entry* p_arr) {
 	// iterate through all nodes, and add edges to the forward graph
 	for (auto i : *(ds->nodes)) {
 		if (p_arr[i+ds->ptr_offset].type == 1) {
-			//cout << "node i: " << i << " forward graph contains: " << p_arr[i+ds->ptr_offset].addr << endl;
 			p_arr[i].forward_graph->push_back(p_arr[i+ds->ptr_offset].addr);
 		}
 	}
@@ -123,7 +123,6 @@ void create_reverse_graph(struct single_struct* ds, struct heap_entry* p_arr) {
 	// iterate through all nodes, and add edges to the reverse graph
 	for (auto i : *(ds->nodes)) {
 		for (auto j : *(p_arr[i].forward_graph)) {
-			//cout << "forward graph contains: " << j << endl;
 			p_arr[j].reverse_graph->push_back(i);
 		}
 	} 
@@ -138,10 +137,11 @@ void reset_graphs(struct heap_entry* p_arr, struct multi_struct *ms) {
     }
 }
 
-void compute_whole_strongly_connected(struct multi_struct *ms, struct heap_entry* p_arr) {
+void compute_whole_scc(struct multi_struct *ms, struct heap_entry* p_arr) {
 	// initialize graph of paths among all nodes in the multistruct
     reset_graphs(p_arr, ms);
 
+	// determine if entire multi struct forms SCC
 	for (auto i : *(ms->single_structs)) {
 		create_forward_graph(i, p_arr);
 		create_reverse_graph(i, p_arr);
@@ -149,8 +149,7 @@ void compute_whole_strongly_connected(struct multi_struct *ms, struct heap_entry
 
 	// compute if the entire multistruct is strongly connected
 	// pick an arbitrary node
-	struct single_struct* ds = ms->single_structs->front();
-	uintptr_t fnode = ds->nodes->front();
+	uintptr_t fnode = ms->single_structs->front()->nodes->front();
 
     // DFS on forward and reverse graphs
    	list<uintptr_t>* forward_visited = new list<uintptr_t>;
@@ -158,10 +157,11 @@ void compute_whole_strongly_connected(struct multi_struct *ms, struct heap_entry
    	list<uintptr_t>* reverse_visited = new list<uintptr_t>;
 	dfs(fnode, p_arr, reverse_visited, 1);
 
-	ms->whole_scc = forward_visited->size() == ms->distinct_nodes && reverse_visited->size() != ms->distinct_nodes;
+    ms->whole_scc = forward_visited->size() == ms->distinct_nodes && reverse_visited->size() == ms->distinct_nodes;
 }
 
-void compute_offset_wise_strongly_connected(struct multi_struct *ms, struct heap_entry *p_arr) {
+void compute_per_offset_scc(struct multi_struct *ms, struct heap_entry* p_arr) {
+	// find number of unique offsets
     ms->each_offset_scc = true;
 
     for (int i = 0; i < ms->max_offset + 1; i++) {
@@ -169,6 +169,7 @@ void compute_offset_wise_strongly_connected(struct multi_struct *ms, struct heap
         reset_graphs(p_arr, ms);
         bool found_offset = false;
         for (auto j : *(ms->single_structs)) {
+			// create graphs per unique offset
             if (j->ptr_offset == i) {
                 found_offset = true;
                 create_forward_graph(j, p_arr);
@@ -184,37 +185,38 @@ void compute_offset_wise_strongly_connected(struct multi_struct *ms, struct heap
         dfs(fnode, p_arr, forward_visited, 0);
         dfs(fnode, p_arr, reverse_visited, 1);
 
+		// check conditions for finding SCC
 	    if (forward_visited->size() != ms->distinct_nodes || reverse_visited->size() != ms->distinct_nodes) {
 		    ms->each_offset_scc = false;
         }
-   }
+    }
 }
 
 // compute various properties of multistructs for classification purposes
 void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
 	compute_distinct_offsets(ms);
 	compute_distinct_nodes(ms);
-    compute_whole_strongly_connected(ms, p_arr);
-    compute_offset_wise_strongly_connected(ms, p_arr);
+    compute_whole_scc(ms, p_arr);
+    compute_per_offset_scc(ms, p_arr);
 }
 
 void pretty_print_multistruct(struct multi_struct *ms) {
     cout << "Multistruct #" << ms->id << endl;
-    cout << "Single structs: ";
+    cout << "  Single structs: ";
     for (auto ds : *(ms->single_structs)) {
         cout << ds->id << " ";
     }
     cout << endl;
-    cout << "Distinct offsets: " << ms->distinct_offsets << endl;
-    cout << "Distinct nodes: " << ms->distinct_nodes << endl;
-    cout << "Max offset: " << ms->max_offset << endl;
+    cout << "  Distinct offsets: " << ms->distinct_offsets << endl;
+    cout << "  Distinct nodes: " << ms->distinct_nodes << endl;
+    cout << "  Max offset: " << ms->max_offset << endl;
     cout << endl;
-    cout << "Overall strongly connected?: " << (ms->whole_scc ? "Yes" : "No") << endl;
-    cout << "Offset-wise strongly connected?: " << (ms->each_offset_scc ? "Yes" : "No") << endl;
+    cout << "  Overall strongly connected?: " << (ms->whole_scc ? "Yes" : "No") << endl;
+    cout << "  Offset-wise strongly connected?: " << (ms->each_offset_scc ? "Yes" : "No") << endl;
     cout << endl;
     
     // use invariants to guess the underlying data structure
-    cout << "Consistent with: ";
+    cout << "  Consistent with: ";
     if (ms->distinct_offsets == 1) {
         if (ms->whole_scc) cout << "circular-singly-linked-list";
         else cout << "linear-singly-linked-list, reverse-binary-tree";
@@ -224,5 +226,5 @@ void pretty_print_multistruct(struct multi_struct *ms) {
             else cout << "linear-doubly-linked-list";
         } else cout << "binary-tree";
     }
-    cout << endl;
+    cout << endl << endl;
 }
