@@ -14,15 +14,18 @@ uintptr_t ending_addr;
 char* memblock;
 
 void usage() {
-    cout << "This program does first scan analysis of pointers in the heap of the core" << endl
-         << "Usage: map_pointers core start_addr end_addr" << endl 
-         << " core       : filename of heap core dump" << endl
-         << " start_addr : starting heap addr as hexadecimal address" << endl
-         << " end_addr   : ending heap address as hexadecimal address" << endl; 
+    cout << "Usage: memery" << endl << endl
+         << "A tool for online analysis of heap memory, including" << endl
+         << "identifying function pointers and linked data structures." << endl;
     return;
 }
 
 int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        usage();
+        return 1;
+    }
+
     if (setup_exploit()) return 1;
 	starting_addr = exploit_startaddr();
 	ending_addr = exploit_endaddr();
