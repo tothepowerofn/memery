@@ -8,8 +8,8 @@ This repository contains the code for the `memery` algorithm, as well as multipl
 
 ## Usage
 
-First, ensure that you have all the tools and packages to run `memery`. You will need `Python3` (aliased as `python3` in your shell) and `NDISASM` (The Netwide Disassembler, often distributed with package name `nasm`).
+First, ensure that you have all the tools and packages to run `memery`. You will need `Python3` (aliased as `python3` in your shell) and `NDISASM` (The Netwide Disassembler, often distributed under package name `nasm`).
 
 Next, enter the root directory of the project and compile `memery` and its tests by typing `make`. Once compilation is complete, 
 
-Then, enter into the `bin/tests` directory and run the executable corresponding to the data structure on which you wish to test `memery`. While allowing the test executable to continue running, start `memery`, located in `bin` (by simply typing `./memery` when in the folder `bin`). `memery` will begin siphoning data from the victimized test program, and output information and analysis about the linked data structures it detected.
+Then, enter into the `bin/tests` directory and run the executable corresponding to the data structure on which you wish to test `memery`. While allowing the test executable to continue running, start `memery`, located in `bin` (by simply typing `./memery` when in the folder `bin`). `memery` will begin siphoning data from the victimized test program, and output information and analysis about the linked data structures it detects.
