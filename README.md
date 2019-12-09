@@ -6,7 +6,7 @@
 
 This repository contains the code for the `memery` algorithm, as well as multiple test programs that use common types of linked data structures that can be used to evaluate `memery`.
 
-`memery` was developed by Nathan Contreras (@tothepowerofn), Mridu Nanda (@mnanda), and Noah Singer (@singerng) as a final project for Harvard CS 263: Systems Security under Prof. James Mickens.
+`memery` was developed by Nathan Contreras (@tothepowerofn), Mridu Nanda (@mridunanda), and Noah Singer (@singerng) as a final project for Harvard CS 263: Systems Security under Prof. James Mickens.
 
 ## Usage
 
