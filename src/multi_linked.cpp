@@ -88,6 +88,7 @@ void compute_distinct_nodes(struct multi_struct *ms) {
 void dfs(uintptr_t index, struct heap_entry* p_arr, list<uintptr_t>* visited, int flag) {
 	// iterate through all the nodes that current index can chase
 	list<uintptr_t>* graph;
+	// check if we are doing an dfs on forward or reverse graph
 	if (flag == 0) {
 		graph = p_arr[index].forward_graph;
 		visited->push_back(index);
@@ -111,7 +112,6 @@ void create_forward_graph(struct single_struct* ds, struct heap_entry* p_arr) {
 	// iterate through all nodes, and add edges to the forward graph
 	for (auto i : *(ds->nodes)) {
 		if (p_arr[i+ds->ptr_offset].type == 1) {
-			//cout << "node i: " << i << " forward graph contains: " << p_arr[i+ds->ptr_offset].addr << endl;
 			p_arr[i].forward_graph->push_back(p_arr[i+ds->ptr_offset].addr);
 		}
 	}
@@ -121,7 +121,6 @@ void create_reverse_graph(struct single_struct* ds, struct heap_entry* p_arr) {
 	// iterate through all nodes, and add edges to the reverse graph
 	for (auto i : *(ds->nodes)) {
 		for (auto j : *(p_arr[i].forward_graph)) {
-			//cout << "forward graph contains: " << j << endl;
 			p_arr[j].reverse_graph->push_back(i);
 		}
 	} 
@@ -136,87 +135,71 @@ void reset_graphs(struct heap_entry* p_arr, struct multi_struct *ms) {
     }
 }
 
-void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
-	compute_distinct_offsets(ms);
-	compute_distinct_nodes(ms);
-	
+void compute_whole_scc(struct multi_struct *ms, struct heap_entry* p_arr) {
 	// initalize graphs
     reset_graphs(p_arr, ms);
 
+	// determine if entire multi struct forms SCC
 	for (auto i : *(ms->single_structs)) {
 		create_forward_graph(i, p_arr);
 		create_reverse_graph(i, p_arr);
 	}
 
-	/*
-	for (auto i : *(ms->single_structs)) {
-		cout << "FORWARD GRAPH: " << endl;
-		for (auto n: *(i->nodes)) {
-			for (auto j : *(p_arr[n].forward_graph)) {
-				cout << "NODE i: " << n << " POINTS TO: " << j << endl;
-			}
-		}
-	}
-
-	for (auto i : *(ms->single_structs)) {
-		cout << "REVERSE GRAPH: " << endl;
-		for (auto n : *(i->nodes)) {
-			for (auto j: *(p_arr[n].reverse_graph)) {
-				cout << "NODE i: " << n << " POINTS TO: " << j << endl;
-			}
-		}
-	}
-	*/
-
-	// TODO: need to make some sort of merged graph of all the single ds
-
-	// compute if single struct is SCC
 	// pick an arbitrary node
-	struct single_struct* ds = ms->single_structs->front();
-	uintptr_t fnode = ds->nodes->front();
+	uintptr_t fnode = ms->single_structs->front()->nodes->front();
 
+	// dsf on forward graph	
    	list<uintptr_t>* forward_visited = new list<uintptr_t>;
 	dfs(fnode, p_arr, forward_visited, 0);
-
-	cout << "NODES VISITED ON FORWARD DFS: " << forward_visited->size() << endl;
 
 	// dfs on reverse graph
    	list<uintptr_t>* reverse_visited = new list<uintptr_t>;
 	dfs(fnode, p_arr, reverse_visited, 1);
-	cout << "NODES VISITED ON reverse DFS: " << reverse_visited->size() << endl;
 
+	// check to see if combination of forward/reverse graphs forms SCC
 	if (forward_visited->size() != ms->distinct_nodes ||reverse_visited->size() != ms->distinct_nodes) {
 		ms->whole_scc = 0;
-		cout << "DID NOT FIND SCC" << endl;
 	}
 	else {
 		ms->whole_scc = 1;
 	}
+}
 
+void compute_per_offset_scc(struct multi_struct *ms, struct heap_entry* p_arr) {
+	// find number of unique offsets
     ms->each_offset_scc = true;
     for (int i = 0; i < ms->max_offset + 1; i++) {
         reset_graphs(p_arr, ms);
         bool found_offset = false;
         for (auto j : *(ms->single_structs)) {
+			// create graphs per unique offset
             if (j->ptr_offset == i) {
                 found_offset = true;
                 create_forward_graph(j, p_arr);
                 create_reverse_graph(j, p_arr);
             }
         }
-        cout << "Found offset " << i << " " << found_offset << endl;
         if (!found_offset) continue;
 
-        forward_visited = new list<uintptr_t>;
-        reverse_visited = new list<uintptr_t>;
+		// initalize variables for dfs
+   		list<uintptr_t>* forward_visited = new list<uintptr_t>;
+   		list<uintptr_t>* reverse_visited = new list<uintptr_t>;
         uintptr_t fnode = ms->single_structs->front()->nodes->front();
         dfs(fnode, p_arr, forward_visited, 0);
         dfs(fnode, p_arr, reverse_visited, 1);
 
+		// check conditions for finding SCC
 	    if (forward_visited->size() != ms->distinct_nodes || reverse_visited->size() != ms->distinct_nodes) {
 		    ms->each_offset_scc = false;
         }
-   }
+    }
+}
+
+void compute_multi_invariants(struct multi_struct *ms, struct heap_entry* p_arr) {
+	compute_distinct_offsets(ms);
+	compute_distinct_nodes(ms);
+	compute_whole_scc(ms, p_arr);
+	compute_per_offset_scc(ms, p_arr);
 }
 
 void pretty_print_multistruct(struct multi_struct *ms) {

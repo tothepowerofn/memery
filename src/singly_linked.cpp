@@ -3,6 +3,7 @@
 #define MIN_DEPTH 2
 
 void reset_seeloop(struct heap_entry* p_arr, uintptr_t index, unsigned int offset) {
+	// allows us to use the .seeloop flag in multiple functions
 	while (p_arr[index].type == T_HEAP && p_arr[index].seeloop) {
 		p_arr[index].seeloop = 0;
 		index = p_arr[index].addr + offset;
@@ -43,6 +44,7 @@ int find_chain_len(struct heap_entry* p_arr, uintptr_t index, unsigned int offse
 }
 
 void assign_chain_ds(struct heap_entry* p_arr, uintptr_t index, unsigned int offset, struct single_struct* ds) {
+	// assign newly found chain with correct ds
 	uintptr_t original_index = index;
 	while (p_arr[index].type == T_HEAP) {
 		if (p_arr[index].seeloop == 1 || p_arr[index].ds) { // check if we encounter a loop or previously seen data structure
@@ -86,7 +88,7 @@ int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr
 	int func_ptr = is_func_ptr((char*) copied_data, 24);
 	if (func_ptr == 1) return T_FUNC;
 	// check for string
-	char* acceptable_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const char* acceptable_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	int is_str = classify_as_ascii((char*) copied_data, acceptable_chars, 3);
 	if (is_str == 1) return T_STR;
 
@@ -94,11 +96,6 @@ int determine_type_onenode(struct heap_entry* p_arr, unsigned int index, uintptr
 }
 
 void finalize_types(struct heap_entry* p_arr, struct single_struct *ds, int* types_per_struct ) {
-	// assign this set of types to all nodes in ds
-	cout << "TYPES PER STRUCT" << endl;
-	for (int i = 0; i < ds->ptr_offset; i++) {
-		cout << types_per_struct[i] << endl;
-	}
 	// loop through all the nodes in the ds
 	for (auto n: *(ds->nodes)) {
 		// traverse down each element in node
@@ -132,9 +129,6 @@ void finalize_nodes(struct heap_entry* p_arr, struct single_struct *ds) {
 	unsigned int fnode_index = ds->nodes->front();
 	int types_per_struct [ds->ptr_offset];
 	for (int i = 0; i < ds->ptr_offset; i++) {
-		cout << "TYPES BEFORE CALLING DET_ONENODE: " << p_arr[fnode_index+i].type << endl;
-	}
-	for (int i = 0; i < ds->ptr_offset; i++) {
 		types_per_struct[i] = determine_type_onenode(p_arr, fnode_index+i, p_arr[fnode_index+i].raw_value);
 	}
 	// set all nodes in ds with the same types as first
@@ -165,8 +159,7 @@ void pretty_print_struct_entry(struct heap_entry *p_arr, unsigned int index, str
 			for (int j = 0; j < 3; j++) {
 				copied_data[j] = read_vuln(elt + 8*j);
 			}
-			printf(" %s (str) || ", copied_data); 
-			//cout << " " << elt << " (str) || ";
+			printf(" %s (str) || ", (char*) copied_data); 
 		}
 		if (type == T_INVALID) {
 			cout << " " << elt << " (invalid) || ";
@@ -202,12 +195,12 @@ std::list<struct single_struct*>* find_singly_linked_ds(struct heap_entry* p_arr
     std::list<struct single_struct*>* ds_list = new std::list<struct single_struct*>;
 
     unsigned int id = 0;
-    /* Go through all candidate pointers in p_arr */
+    // Go through all candidate pointers in p_arr
     for (unsigned int offset = 0; offset < MAX_OFFSET; offset++) { // Loop through potential offsets for pointers in struct
         for(uintptr_t i = 0; i < num_p; i++) {
             if (p_arr[i].ds) continue;
             if (p_arr[i].type == T_INT) continue; //If it's not a pointer
-			/* finds depth of chain with given offset */
+			// finds depth of chain with given offset
             struct single_struct *ds;
 			int depth = find_chain_len(p_arr, i, offset, &ds);
 			if(depth < MIN_DEPTH && (!ds || p_arr[i].ds)) {
