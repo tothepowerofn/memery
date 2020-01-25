@@ -2,9 +2,9 @@
 *memey memes*
 
 
-`memery` is a proof-of-concept tool for extracting information about the high-level program constructs of an executable with a memory read vulnerability by following chains of pointers. The current implememntation reliably detects both singly- and doubly-linked data structures, and detects data types of interest within those structures, such as function pointers and character string pointers.
+`memery` is a proof-of-concept tool for extracting information about the high-level program constructs of an executable with a memory read vulnerability by following chains of pointers. It was developed as a final project for Harvard's CS263: Systems Security course. The current implememntation reliably detects both singly- and doubly-linked data structures, and detects data types of interest within those structures, such as function pointers and character string pointers.
 
-This repository contains the code for the `memery` algorithm, as well as multiple test programs that use common types of linked data structures that can be used to evaluate `memery`.
+This repository contains the paper PDF describing the project, the code for the `memery` algorithm, as well as multiple test programs that use common types of linked data structures that can be used to evaluate `memery`.
 
 `memery` was developed by Nathan Contreras (@tothepowerofn), Mridu Nanda (@mridunanda), and Noah Singer (@singerng) as a final project for Harvard CS 263: Systems Security under Prof. James Mickens.
 
